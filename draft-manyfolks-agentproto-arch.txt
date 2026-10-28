@@ -5,15 +5,15 @@
 Agent Communication Protocols                               J. Rosenberg
 Internet-Draft                                               jdrosen.net
 Intended status: Informational                                 Z. Sarker
-Expires: 29 April 2027                                          T. Reddy
+Expires: 1 May 2027                                             T. Reddy
                                                                    Nokia
                                                                   K. Yao
                                                             China Mobile
                                                                   D. Liu
-                                                           Alibaba Cloud
+                                                                 Alibaba
                                                              S. Krishnan
                                                                    Cisco
-                                                         26 October 2026
+                                                         28 October 2026
 
 
   Terminology, Framework and Architecture for the Agent Communications
@@ -69,7 +69,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 29 April 2027.
+   This Internet-Draft will expire on 1 May 2027.
 
 Copyright Notice
 
@@ -1176,9 +1176,9 @@ Table of Contents
    [I-D.agentic-ai-usecases-requirements]
               Reddy.K, T., Sarker, Z., and K. Yao, "Agentic AI Use Cases
               and Requirements", Work in Progress, Internet-Draft,
-              draft-agentic-ai-usecases-requirements-04, 15 October
+              draft-agentic-ai-usecases-requirements-05, 27 October
               2026, <https://datatracker.ietf.org/doc/html/draft-
-              agentic-ai-usecases-requirements-04>.
+              agentic-ai-usecases-requirements-05>.
 
    [I-D.ietf-oauth-identity-chaining]
               Schwenkschuster, A., Kasselman, P., Burgin, K., Jenkins,
@@ -1272,7 +1272,7 @@ Authors' Addresses
 
 
    Dapeng Liu
-   Alibaba Cloud
+   Alibaba
    Email: max.ldp@alibaba-inc.com
 
 

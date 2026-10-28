@@ -5,13 +5,13 @@
 Network Working Group                                          Z. Sarker
 Internet-Draft                                                  T. Reddy
 Intended status: Informational                                     Nokia
-Expires: 29 April 2027                                            K. Yao
+Expires: 1 May 2027                                               K. Yao
                                                             China Mobile
                                                                   D. Liu
                                                            Alibaba Cloud
                                                              S. Krishnan
                                                                    Cisco
-                                                         26 October 2026
+                                                         28 October 2026
 
 
              Reference Architecture for Agent Communication
@@ -43,7 +43,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 29 April 2027.
+   This Internet-Draft will expire on 1 May 2027.
 
 Copyright Notice
 
@@ -843,9 +843,9 @@ Informative References
    [I-D.agentic-ai-usecases-requirements]
               Reddy.K, T., Sarker, Z., and K. Yao, "Agentic AI Use Cases
               and Requirements", Work in Progress, Internet-Draft,
-              draft-agentic-ai-usecases-requirements-04, 15 October
+              draft-agentic-ai-usecases-requirements-05, 27 October
               2026, <https://datatracker.ietf.org/doc/html/draft-
-              agentic-ai-usecases-requirements-04>.
+              agentic-ai-usecases-requirements-05>.
 
    [I-D.ietf-oauth-identity-chaining]
               Schwenkschuster, A., Kasselman, P., Burgin, K., Jenkins,
