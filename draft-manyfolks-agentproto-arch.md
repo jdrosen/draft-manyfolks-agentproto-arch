@@ -391,6 +391,24 @@ We can think about the ACP protocol as have three core building blocks.
 | | - Recovery       | |                  | | - Credential     | |
 | |                  | |                  | |   reference      | |
 | +--------+---------+ +---------+--------+ +---------+--------+ |
+|                         Dialog Context                         |
++----------------------------------------------------------------+
+                                |
+                                v
++----------------------------------------------------------------+
+|                          Transport                             |
+|  - Multiplexed Streams                                         |
+|  - Per-stream Semantics                                        |
+|  - Connection continuity (Connection ID, TLS resumption)       |
+|  - Protocols: HTTP, QUIC, WebTransport, WebRTC, MoQT           |
++----------------------------------------------------------------+
+                                 |
+                                 v
++----------------------------------------------------------------+
+|                       Security                                 |
+|  - Channel Protection                                          |
+|  - Mutual Authentication                                       |
+|  - Protocol: TLS 1.3, WIT/WPT                                  |
 +----------------------------------------------------------------+
 ~~~
 
