@@ -97,7 +97,7 @@ informative:
 
 --- abstract
 
-This document defines the terminology and architecture for AI agent communications protocols over the Internet. It provides the foundational architectural elements for the Agent Communications Protocol (ACP) - also known as agentproto - a new protocol to be developed in the IETF. ACP enables communication between user agent clients and AI agents, between AI Agents and other AI Agents, or between AI Agents and tools. All three of these interaction patterns - and the many use cases therein - require a session-type protocol which handles lifecycle management, including creation, modification, deletion and so on - along with the exchange of input and output. These sessions can be extremely long lived - running for hours or even days - and span multiple IP hosts used by the both the principal and by the agent. They can also be highly intermittent with asynchronous responses. All of these mean a new type of session protocol is needed. 
+This document defines the terminology and architecture for AI agent communications protocols over the Internet. It provides the foundational architectural elements for the Agent Communications Protocol (ACP) - also known as agentproto - a new protocol to be developed in the IETF. ACP enables communication between user agent clients and AI agents, between AI Agents and other AI Agents, or between AI Agents and tools. All three of these interaction patterns - and the many use cases therein - require a session-type protocol which handles lifecycle management, including creation, modification, deletion and so on - along with the exchange of input and output. These sessions can be extremely long lived - running for hours or even days - and span multiple IP hosts used by the both the principal and by the agent. They can also be highly intermittent with asynchronous responses. All of these mean a new type of session protocol is needed.
 
 
 
@@ -105,10 +105,10 @@ This document defines the terminology and architecture for AI agent communicatio
 
 # Introduction {#intro}
 
-The widespread usage of AI Agents on the Internet has introduced new forms of networked communications. User agent clients connect to AI agents running elswehere, AI agents communicate with other AI agents, and AI agents communicate with tools. All three of these interaction patterns - and the many use cases therein - require a session-type protocol which handles lifecycle management, including creation, modification, deletion and so on - along with the exchange of input and output. These sessions can be extremely long lived - running for hours or even days - and span multiple IP hosts used by the both the principal and by the agent. They can also be highly intermittent with asynchronous responses. All of these mean a new type of session protocol is needed. 
+The widespread usage of AI Agents on the Internet has introduced new forms of networked communications. User agent clients connect to AI agents running elswehere, AI agents communicate with other AI agents, and AI agents communicate with tools. All three of these interaction patterns - and the many use cases therein - require a session-type protocol which handles lifecycle management, including creation, modification, deletion and so on - along with the exchange of input and output. These sessions can be extremely long lived - running for hours or even days - and span multiple IP hosts used by the both the principal and by the agent. They can also be highly intermittent with asynchronous responses. All of these mean a new type of session protocol is needed.
 
 
-These sessions differ from the type of sessions created by the Session Initiation Protocol (SIP) [RFC3261], which are shorter lived and work between a single IP host for each participant. 
+These sessions differ from the type of sessions created by the Session Initiation Protocol (SIP) [RFC3261], which are shorter lived and work between a single IP host for each participant.
 
 This document introduces concepts, terminology, reference architecture and protocol functional blocks for ACP, which manages agentic dialogs. An agentic dialog is defined as a session between two parties - a principal whose role is to provide input to, and receive output from, an agent - and the agent, which is running a process which has properties which are agentic in nature. The agentic properties that are relevant here are (1) conversational contuity, and (2) driven by natural language in each direction. These concepts are discussed in more detail in this document.
 
@@ -151,32 +151,32 @@ Context:
 : Context is central to the concept of AI Agents. There are many definitions on the Internet. Anthropic defines it as "the set of tokens included when sampling from a large-language model (LLM)." {{anthropic-context-def}}. The goal of ACP is to exchange the input from the principal to allow the agent to manage context, and the output from inference of that context.
 
 LLM Context:
-: Same as context. We used the adjective "LLM" in front of context to help differentiate LLM context from dialog context. 
+: Same as context. We used the adjective "LLM" in front of context to help differentiate LLM context from dialog context.
 
 Agentic Dialog:
 : A session between two parties - a principal whose role is to provide input to, and receive output from, an agent - and the agent, which is running a process which has properties which are agentic in nature and result in the maintenance of LLM context. The agentic properties that are relevant here are (1) conversational contuity, and (2) driven by natural language in each direction. An agentic dialog is associated 1-1 with the LLM context it builds. ACP doesn't define how the agent maintains the LLM context; it merely allows for the establishment of an agentic dialog and exchange of data which allows the agent to do so.
 
 Input:
-: Information provided by the principal, which is used to drive the operation of the agent. In simplest terms, this is the stuff that the principal types or speaks to the AI agent, e.g., "I want to book a trip to Maui" or "That sounds like a good idea but what is the weather like that time of year?". 
+: Information provided by the principal, which is used to drive the operation of the agent. In simplest terms, this is the stuff that the principal types or speaks to the AI agent, e.g., "I want to book a trip to Maui" or "That sounds like a good idea but what is the weather like that time of year?".
 
 Output:
-: The information produced by the agent which are meant to be conveyed to the principal. There are three distinct forms of output - response, information, and progress. 
+: The information produced by the agent which are meant to be conveyed to the principal. There are three distinct forms of output - response, information, and progress.
 
 Response Output:
-: This is the portion of the output which is meant to be shown to the user, and is what the user needs to know to decide their next input. For example, "I've booked that trip for you. Do you need a car too?". The output can of course constitute any modality. 
+: This is the portion of the output which is meant to be shown to the user, and is what the user needs to know to decide their next input. For example, "I've booked that trip for you. Do you need a car too?". The output can of course constitute any modality.
 
 Information Output:
 : This is the portion of the output which helps the principal understand what the agent has done, but is not necessarily required for them to compose their input. This includes tool call summaries, reasoning, sub-agent invocations, and so on. Information output is content that the agent used to build its local context but is not necessary for the principal to know.
 
 Progress:
-: This is the portion of the output that provides updates on work to the principal. This includes token counts, time elapsed, usage progress, and so on. Progress output is informational in nature, like information output, but it has the important distinction that it is not data the agent used to build its LLM context. As a result, it is almost aways generated by the agent harness and not the LLM itself. 
+: This is the portion of the output that provides updates on work to the principal. This includes token counts, time elapsed, usage progress, and so on. Progress output is informational in nature, like information output, but it has the important distinction that it is not data the agent used to build its LLM context. As a result, it is almost aways generated by the agent harness and not the LLM itself.
 
 
 Dialog Context:
-: Dialog context refers to the state maintained by, and exchanged via, the ACP protocol. Each agentic dialog is associated 1-1 with an instance of dialog context. The dialog context has two primary elements - meta-data and the log. Meta-data is the set of information that is required for the operation of the protocol itself, and includes protocol identifiers (such as the Agentic Dialog Identifier (ADID)), participants along with their identifiers and roles, supported modalities, start time, and so on. The log is the append-only collection of the inputs provided by the principal, the outputs provided by the agent (inclusive of response, information and progress output). The log includes data across all modalities, including real-time voice and video, along with text, images and structured data. 
+: Dialog context refers to the state maintained by, and exchanged via, the ACP protocol. Each agentic dialog is associated 1-1 with an instance of dialog context. The dialog context has two primary elements - meta-data and the log. Meta-data is the set of information that is required for the operation of the protocol itself, and includes protocol identifiers (such as the Agentic Dialog Identifier (ADID)), participants along with their identifiers and roles, supported modalities, start time, and so on. The log is the append-only collection of the inputs provided by the principal, the outputs provided by the agent (inclusive of response, information and progress output). The log includes data across all modalities, including real-time voice and video, along with text, images and structured data.
 
 Log:
-: The portion of the dialog context that is the append-only sequence of input from the principal and output (response, information and progress) from the agent. 
+: The portion of the dialog context that is the append-only sequence of input from the principal and output (response, information and progress) from the agent.
 
 Agentic Dialog Identifier (ADID):
 : An identifier which identifies an agentic dialog and the context associated with it. This identifier survives network interruption or change.
@@ -186,11 +186,11 @@ Modality:
 : A category of data exchanged in an agentic dialog, such as text, audio, image, video or structured data.
 
 Progress Signaling:
-: The act of providing progress output from the agent to the principal. 
+: The act of providing progress output from the agent to the principal.
 
 
 Administrative Domain:
-: A set of entities, such as agents, tools, and intermediaries, that are
+: A set of entities, such as agents, tools, and principals, that are
 subject to a common authorization policy and a common authority.
 
 Agent Identity:
@@ -210,9 +210,6 @@ Tool:
 Trust Boundary:
 : A boundary between administrative domains.
 
-Intermediary:
-: An entity that relays or processes messages between agentic dialog participants.
-
 Message:
 : A discrete unit of communication exchanged between agentic dialog participants.
 
@@ -222,11 +219,29 @@ Message:
 
 # Interaction Pattern
 
-ACP targets three distinct interaction patterns. 
+ACP targets three distinct interaction patterns:
+
+~~~
++-------------+
+| User /      |
+| Principal   |
++------+------+
+ (ACP) |
+       v
++-------------+        +--------+
+|  Agent (A)  |------->|  Tool  |
++------+------+ (ACP.  +--------+
+  (ACP)|         other)
+       V
++-------------+        +--------+
+|  Agent (A)  |------->|  Tool  |
++------+------+ (ACP,  +--------+
+                 other)
+~~~
 
 ## User Agent to AI Agent
 
-In this interaction pattern, a human user (which we'll just refer to as a user) is sitting in front of a desktop application, mobile application, or web application providing a user interface for engaging with an AI agent. The AI agent runs elsewhere - on a server - different from the user agent. In this pattern, the user agent is really a "thin client" of sorts -  passing information from the user to the AI Agent, and passing information from the AI Agent to the user. This communications protocol would pass user messages, AI agent responses, meta-data like token usage, sub-agent spawns and completions, and so on. If the AI agent supports voice input and spoken output, the communications protocol would pass real-time voice information back and forth as well.  Basically - all of the information needed to render the UI. 
+In this interaction pattern, a human user (which we'll just refer to as a user) is sitting in front of a desktop application, mobile application, or web application providing a user interface for engaging with an AI agent. The AI agent runs elsewhere - on a server - different from the user agent. In this pattern, the user agent is really a "thin client" of sorts -  passing information from the user to the AI Agent, and passing information from the AI Agent to the user. This communications protocol would pass user messages, AI agent responses, meta-data like token usage, sub-agent spawns and completions, and so on. If the AI agent supports voice input and spoken output, the communications protocol would pass real-time voice information back and forth as well.  Basically - all of the information needed to render the UI.
 
 If the user agent is a thick desktop application, the communications protocol is from the user's desktop to the AI agent on the server. In a mobile app, it is from their mobile app to the AI agent on the server. If the user agent is a web application, it is most likely from the web server to the the server on which the AI agent is running.
 
@@ -267,7 +282,7 @@ Conversational continuity means that, as far as the principal is concerned, the 
 
 The LLM context is used by the agent to determine how to satisfy the needs of the principal as specified via input. Those needs may evolve over time.
 
-Conversational continuity means that the LLM context is associated 1-1 with each agentic dialog that feeds it. 
+Conversational continuity means that the LLM context is associated 1-1 with each agentic dialog that feeds it.
 
 ### Driven by Natural Language
 
@@ -281,7 +296,7 @@ Agentic dialogs have other properties which are impactful on the protocol.
 
 ### It has a Start
 
-Perhaps obvious but worth stating. The agentic dialog has a start. This start is the point at which the dialog context and LLM context are both initialized. The LLM context may not be initialized as empty; the agent might use the identity of the principal to add personalization. Or, it may be a coding agent which reads an agents.md file to initialize what it is doing. It might read system instructions. For the agent to behave properly, it needs to be told that a particular agentic dialog is starting. The log portion of the dialog context is, however, initialized as empty. 
+Perhaps obvious but worth stating. The agentic dialog has a start. This start is the point at which the dialog context and LLM context are both initialized. The LLM context may not be initialized as empty; the agent might use the identity of the principal to add personalization. Or, it may be a coding agent which reads an agents.md file to initialize what it is doing. It might read system instructions. For the agent to behave properly, it needs to be told that a particular agentic dialog is starting. The log portion of the dialog context is, however, initialized as empty.
 
 ### It may be Long Lived
 
@@ -326,7 +341,7 @@ There is a distinction between the principal and the client. The principal exist
 
 In the same way, the "agent" exists outside of the protocol as well. It is an AI agent, though it could be a human being. The server is the piece of software - also traditional software - which implements ACP and is responsible for funneling information to and from the AI Agent.
 
-This distinction is important because it helps us understand how to properly layer the system. 
+This distinction is important because it helps us understand how to properly layer the system.
 
 
 ### ACP Manages Dialog Context - not LLM Context
@@ -337,20 +352,20 @@ Firstly, the LLM context is usually initialized with system instructions, which 
 
 What ACP does exchange, is input and output. Input is information the principal wishes to send to the agent, and output is information the agent wishes to send to the principal. The input and output are appended to form the log, the main part of the dialog context.
 
-The distinction between LLM context and dialog context also aligns with the distinction between server and agent. The LLM context is a core property of the agent, NOT of the server, whereas the dialog context is a property of the server, and not its associated agent. In ACP,  we are conveying information to and from the agent on the server, but the LLM context lives with the agent. The protocol will concern itself with technical conveyance issues necessary to make sure both client and server have an aligned view of the dialog context. But, how that dialog context is related to the LLM context is a matter of local implementation. 
+The distinction between LLM context and dialog context also aligns with the distinction between server and agent. The LLM context is a core property of the agent, NOT of the server, whereas the dialog context is a property of the server, and not its associated agent. In ACP,  we are conveying information to and from the agent on the server, but the LLM context lives with the agent. The protocol will concern itself with technical conveyance issues necessary to make sure both client and server have an aligned view of the dialog context. But, how that dialog context is related to the LLM context is a matter of local implementation.
 
 
 ### Output Isnt Just the Response
 
 The output has three distinct elements:
 
-* Responses: This is the output of the agent which needs to be rendered to the principal for them to make a decision on what to do next. Examples include text responses, like "I've booked that trip for you, do you need a car?", images - such as a photo of a hotel or a rendered image from an image-generation agent, real-time voice - used by live agents that interact with principals over real-time voice, common in contact center applications for example, real-time video - an emerging output modality used by agents that are represented by talking-heads, able to move their mouths, make facial expressions and so on. Of course, it also includes structured data - for example a JSON object or HTML page. 
+* Responses: This is the output of the agent which needs to be rendered to the principal for them to make a decision on what to do next. Examples include text responses, like "I've booked that trip for you, do you need a car?", images - such as a photo of a hotel or a rendered image from an image-generation agent, real-time voice - used by live agents that interact with principals over real-time voice, common in contact center applications for example, real-time video - an emerging output modality used by agents that are represented by talking-heads, able to move their mouths, make facial expressions and so on. Of course, it also includes structured data - for example a JSON object or HTML page.
 
-* Information: This is the output of the agent which is useful for the principal to know, and is used by the agent as part of its LLM context - but is not necesarily essential for the principal to observe in order to determine their next input. Examples of this include tool calls, sub-agent invocations, and reasoning. 
+* Information: This is the output of the agent which is useful for the principal to know, and is used by the agent as part of its LLM context - but is not necesarily essential for the principal to observe in order to determine their next input. Examples of this include tool calls, sub-agent invocations, and reasoning.
 
-* Progress: Whereas information output is generated by the LLM and fed back into the agents internal context, progress is data generated by the harness and is useful to understand status. This includes token counts, turn durations, and costs. 
+* Progress: Whereas information output is generated by the LLM and fed back into the agents internal context, progress is data generated by the harness and is useful to understand status. This includes token counts, turn durations, and costs.
 
-It is important to note that a piece of output in the dialog context is not necessarily exactly the same as what the agent adds to LLM context. For example, the agent may apply obfuscation to sensitive tool call results. Or, it may simplify the tool call output to facilitate comprehension by the principal, by omitting unimportant fields (a trace ID for example). 
+It is important to note that a piece of output in the dialog context is not necessarily exactly the same as what the agent adds to LLM context. For example, the agent may apply obfuscation to sensitive tool call results. Or, it may simplify the tool call output to facilitate comprehension by the principal, by omitting unimportant fields (a trace ID for example).
 
 
 
@@ -368,7 +383,7 @@ In the same way, a particular named agent - and any instance of an agentic dialo
 
 ACP, as an on-the-wire protocol, runs over an IP network between the clients and servers.
 
-The ACP protocol is fundamentally two-party - it is between a principal and an agent. More complex topologies are supported by cascading together multiple independent agentic dialogs. For example, a user might connect to a an agent for banking, and that agent connects to a second agent for a mortgage quote. In this case, there are two distinct agentic dialogs, two unrelated instances of ACP. They are connected only through delegated identities and tracing identifiers that are passed from one to the other.
+The ACP protocol is fundamentally two-party - it is between a principal and an agent. More complex topologies are supported by cascading together multiple independent agentic dialogs. For example, a user might connect to a an agent for banking, and that agent connects to a second agent for a mortgage quote. In this case, there are two distinct agentic dialogs, two unrelated instances of ACP. They are connected only through delegated identities and the chain of dialog context identifiers that are passed from one to the other.
 
 The clients and servers exist on IP hosts. The agent in the picture is conceptual in nature, and is not an IP host. It might be a human, but most often is an AI agent composed of a harness and LLM, building and using context fed by the input received from the server.
 
@@ -425,18 +440,14 @@ and across transport connections.
 
 Every agentic dialog is required to have an agentic dialog identifier (ADID). The identifier is required to:
 
-- correlate all messages that belong to the agentic dialog, in every direction and at
-  every hop;
+- correlate all messages that belong to the agentic dialog, in each direction
 - survive the loss or replacement of a transport connection, so that the
   agentic dialog is not tied to a TCP connection, QUIC connection, or TLS
   association;
-- be usable by an intermediary to correlate the requests it receives with the
-  requests it forwards, without access to dialog context.
+- be usable by an entity to link to distinct agentic dialogs, where one is triggered based on the other - for example, in sub-agent delegation.
 
-A dialog can involve more than two participants, such as delegated agents,
-intermediaries, or members of a group. The dialog context identifier is therefore not
-required to imply a client-server relationship between participants [OPEN ISSUE].
 
+The dialog identifier should be a UUID, unique in space and time, and unguessable. Knowledge of an ADID provides no information whatsoever about the agentic dialog. Knowledge of he ADID is also insufficient for a client to connect to the server and access the agentic dialog in any way - the client must also authenticate itself, and be authorized for such access.
 
 ### Lifecyle
 
@@ -444,17 +455,18 @@ ACP needs to perform lifecycle management, covering:
 
 * Initiation: beginning a new agentic dialog
 
-* Termination: ending an agentic dialog
+* Termination: ending an agentic dialog such that it cannot be resumed
 
 * Suspension: Pausing input or output, so that there no longer remains any active transport level connection for exchaning that input or output. Suspension could be time based, or explicitly triggered.
 
-* Resumption: Resuming input or output, requiring (if needed) creation or modification of transport connections to convey the input or output
+* Resumption: Resuming input or output, requiring (if needed) creation or modification of transport connections to convey the input or output. Resumption also requires protocol agreement on whether the client needs to replay prior input, or whether the server had already processed it.
 
 * Cancellation: cancellation of prior input
 
-* Rehydration: If a new client instance starts up in the middle of the dialog, it may need to hydrate any input or output which had been sent or received but not yet made it to any local databases used for storage.
 
-Agent interactions are often long-lived, interruption-prone, and delegated across multiple hops. Each agentic dialog is required to have an ADID that survives network interruption or change. If a transport connection is interrupted, an authorized agent uses the ADID to re-associate the existing agentic dialog with the newly formed connection, instead of initiating a new agentic dialog.  An intermediary uses the ADID to correlate the requests it receives with the requests it forwards. Neither function requires access to dialog context.
+Agent interactions are often long-lived, interruption-prone, and delegated across multiple hops. Each agentic dialog is required to have an ADID that survives network interruption or change. If a transport connection is interrupted, an agent uses the ADID to re-associate the existing agentic dialog with the newly formed connection, instead of initiating a new agentic dialog. Of course, proper authentication is also required - knowledge of the ADID is insufficient for the newly formed connection to be associated to the agentic dialog.
+
+Similarly, an agent performing delegation uses the ADID to correlate the agentic dialog it terminates, with the one it initiates.
 
 Agentic Dialogs are defined above any transport protocol connection (TCP connection, QUIC connection) or TLS association. QUIC Connection ID and TLS resumption provide connection-level continuity; they preserve transport and cryptographic state, not agentic dialog state.
 
@@ -476,6 +488,9 @@ As noted in {#network-arch}, ACP needs to handle the fact that the agentic dialo
 
 Similarly, ACP needs to provide recovery in case any of these hosts should fail during the agentic dialog. This can happen during the exchange of real-time media (e.g., a server fails while receiving the user's voice input), or during the transmission of non-real-time input (the client sends a text message, and the server failed while processing it, but before completion of that processing).
 
+ACP also needs to provide rehydration. If a new client instance starts up in the middle of the dialog, it may need to hydrate any input or output which had been sent or received but not yet made it to any local databases used for storage.
+
+
 ### Structured Error and Progress Signaling {#error-signaling}
 
 ACP is required to carry more than the final output of the agent in each turn. It is required to also convey incremental output, progress updates, checkpoint states, cancellation states, and structured errors usable by an orchestrating peer. Error signaling is required to distinguish transport failure from application failure, authorization failure, policy rejection, timeout, validation failure, and interoperability problems. Progress and liveness notifications are required to be representable independently of final completion so that a peer can tell whether an agent is active, blocked on external input, or waiting in a recoverable state. It is required to ensure that terminal error or cancellation signals are not silently lost if an ordinary data stream fails.
@@ -494,7 +509,7 @@ the Agent Communication Protocol needs to associate with a dialog so that
 existing authorization mechanisms can be applied at the points where they
 matter.
 
-ACP relies on objects defined by other standards to convey authorization and identities. In this way, it is extensible and modular to evolving work in this area in the OAuth working group. 
+ACP relies on objects defined by other standards to convey authorization and identities. In this way, it is extensible and modular to evolving work in this area in the OAuth working group.
 
 ### Delegation {#delegation}
 
@@ -511,7 +526,18 @@ the delegating agent for the next. A delegating agent can re-delegate authority
 derived from the original principal. A delegation can be revoked or terminated
 independently of the agentic dialog in which it was used.
 
-In delegated use cases, there are two distinct agentic dialogs, each with a distinct dialog context. The first is between the principal and the delegating agent, and the second between the delegating agent and the delegated agent. We refer to the second of these as the delegated dialog context. The delegated dialog context has two additional pieces of meta-data - the ADID of the first dialog context, and the identity of the principal in the first context. The delegating agent is responsible for communicating these over ACP. 
+In delegated use cases, there are two distinct agentic dialogs, each with a distinct dialog context and a distinct ADID. The first is between the principal and the delegating agent, and the second between the delegating agent and the delegated agent. We refer to the second of these as the delegated dialog context. The delegated dialog context has two additional pieces of meta-data - the ADID of the first dialog context, and the identity of the principal in the first context. The delegating agent is responsible for communicating these over ACP. Conceptually, it looks like this:
+
+~~~
+
+Principal --------------> Delegating Agent --------------> Delegated Agent
+              ADID:167                         ADID:293
+                                               ADID-Delegation-Chain: 167
+                                               Delegated-From: Principal
+
+~~~
+
+ADID 167 refers to the agentic dialog between the principal and delegating agent. There is a separate agentic dialog, with ADID 293, between the delegating agent and the delegated agent. However, when the second agentic dialog is formed, the delegating agent provides the chain of prior ADIDs. In this case, there is just one - 167 - which refers to the agentic dialog which triggered it. THe delegating agent also conveys the identity of the principal on whose behalf they are operating, in this case it is the original principal.
 
 The constraints in {{intent-execution}} and {{delegation-chain}} apply: the
 authority passed at each hop is limited to the delegated task and is not
@@ -534,14 +560,13 @@ The architecture keeps the following identities distinct:
   whose behalf an agent acts;
 - the agent identity, which is the identity of the agent itself and is
   distinct from that of the principal;
-- the identity of an intermediary that relays or processes messages in the
-  dialog.
+
 
 Keeping these identities distinct is required so that a participant can
 distinguish the principal, the delegating agent, and the delegated agent, and so that accountability can be
 assigned to the right entity.
 
-In multi-party use cases, such as when there is a "conference call" between two users and an AI agent, there will be two distinct agentic dialogs, each with a distinct dialog context. However, the LLM context is shared, so that the agent is "seeing" the inputs from both principals, and both principals see the output from the agent. Each principal also needs to see the other's input. This introduces the need to associate the identity of the principal with each input, and the need for ACP to communicate input from the server, back to the client, that wasn't sent by the principal on that dialog. 
+In multi-party use cases, such as when there is a "conference call" between two users and an AI agent, there will be two distinct agentic dialogs, each with a distinct dialog context. However, the LLM context is shared, so that the agent is "seeing" the inputs from both principals, and both principals see the output from the agent. Each principal also needs to see the other's input. This introduces the need to associate the identity of the principal with each input, and the need for ACP to communicate input from the server, back to the client, that wasn't sent by the principal on that dialog.
 
 # Security  {#security}
 
@@ -558,7 +583,7 @@ These identity requirements are satisfied by using WIMSE Workload Credentials {{
 ## Channel Protection {#channel-protection}
 
 All agent communication is required to be encrypted and mutually authenticated. This architecture does not define a fallback to cleartext or unauthenticated operation.
-Authentication may operate at the transport layer, the application layer, or both. Transport-layer authentication works well when TLS connections are not terminated by intermediaries. In architectures involving proxies, application-layer authentication is required to maintain identity continuity across TLS termination points. The channel protection mechanism is required to be negotiated during transport connection establishment, with both endpoints authenticating before any message is exchanged.
+Authentication may operate at the transport layer, the application layer, or both. Transport-layer authentication works well when TLS connections are not terminated by intermediary IP hosts. In architectures involving proxies, application-layer authentication is required to maintain identity continuity across TLS termination points. The channel protection mechanism is required to be negotiated during transport connection establishment, with both endpoints authenticating before any message is exchanged.
 
 ## Intent-Execution Separation {#intent-execution}
 
@@ -636,7 +661,7 @@ The following existing protocols may require profiling or extension; this list i
 
 AI agents enlarge the attack surface: they act autonomously, delegate across administrative domains, and operate over long-lived dialogs that rely on long-standing delegated authority. This section highlights threats specific to the building blocks in this document; detailed mitigations are expected in the specifications of those building blocks.
 
-Delegated authority is the primary risk. A rogue or compromised agent may attempt to use delegated authority beyond the task it was granted, or to broaden it as it delegates onward. As required in {{intent-execution}} and {{delegation-chain}}, authority granted to an agent is scoped to the delegated task and cannot be broadened along the chain, and the delegation chain is verifiable at each hop so an intermediary cannot forge or escalate it.
+Delegated authority is the primary risk. A rogue or compromised agent may attempt to use delegated authority beyond the task it was granted, or to broaden it as it delegates onward. As required in {{intent-execution}} and {{delegation-chain}}, authority granted to an agent is scoped to the delegated task and cannot be broadened along the chain, and the delegation chain is verifiable at each hop so an agent on the chain cannot forge or escalate it.
 
 Valid credentials do not show that an agent runs on an uncompromised platform. Attestation allows a peer to assess the integrity of the agent's execution environment.
 
@@ -644,10 +669,7 @@ QUIC and TLS 1.3 0-RTT data can be replayed by an attacker (Section 8 of {{RFC98
 
 # Privacy Considerations {#privacy}
 
-Dialog context identifiers and dialog context persist across intermediaries and
-trust boundaries. An intermediary or other observer can use them to link
-interactions that would otherwise be separate and to track agent and user/principal's
-activity over time. The Agent Communication Protocol is expected to analyze
+The ADID is used to correlate together distinct agentic dialogs, when one of them triggers the next. This means entities which know the ADID could attempt to access dialog contexts they were not privvy to. The Agent Communication Protocol is expected to analyze
 these risks and specify mitigations, such as limiting the scope and
 lifetime of dialog context identifiers.
 
