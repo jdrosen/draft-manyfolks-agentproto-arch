@@ -42,7 +42,7 @@ author:
     email: yaokehan@chinamobile.com
   -
     name: Dapeng Liu
-    organization: Alibaba Cloud
+    organization: Alibaba
     email: max.ldp@alibaba-inc.com
   -
     name: Suresh Krishnan
