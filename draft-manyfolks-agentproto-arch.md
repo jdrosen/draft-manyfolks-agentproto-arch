@@ -1,5 +1,5 @@
 ---
-title: "Terminology, Framework and Architecture for the Agent Communications Protocol (ACP)"
+title: "Architecture for AI Agent Communications on the Internet"
 abbrev: "AgentProto Arch"
 category: info
 
@@ -97,7 +97,7 @@ informative:
 
 --- abstract
 
-The Agent Communications Protocol (ACP) - also known as agentproto - is a new protocol to be developed in the IETF. It is meant to be used between user agent clients and AI agents, or between AI Agents and other AI Agents, or between AI Agents and tools. All three of these use cases - and the many variations therein - all require a session-type protocol which handles lifecycle management, including creation, modification, deletion, and so on. These sessions differ from the type of sessions created by the Session Initiation Protocol (SIP) in several important ways. These sessions can be extremely long lived - running for hours or even days. An example is a lengthy coding session. They can also be highly intermittent with asynchronous responses. All of these mean a new type of session protocol is needed. This document introduces concepts, terminology, reference architecture and the protocol functional blocks for the Agentic Communications Protocol (ACP).
+This document defines the terminology and architecture for AI agent communications protocols over the Internet. It provides the foundational architectural elements for the Agent Communications Protocol (ACP) - also known as agentproto - a new protocol to be developed in the IETF. ACP enables communication between user agent clients and AI agents, between AI Agents and other AI Agents, or between AI Agents and tools. All three of these interaction patterns - and the many use cases therein - require a session-type protocol which handles lifecycle management, including creation, modification, deletion and so on - along with the exchange of input and output. These sessions can be extremely long lived - running for hours or even days - and span multiple IP hosts used by the both the principal and by the agent. They can also be highly intermittent with asynchronous responses. All of these mean a new type of session protocol is needed. 
 
 
 
@@ -105,9 +105,10 @@ The Agent Communications Protocol (ACP) - also known as agentproto - is a new pr
 
 # Introduction {#intro}
 
-The widespread usage of AI Agents on the Internet has introduced new forms of networked communications. User agent clients connect to AI agents running elswehere, AI agents communicate with other AI agents, and AI agents communicate with tools. All three of these use cases - and the many variations therein - all require a session-type protocol which handles lifecycle management, including creation, modification, deletion, cancellation, and so on. These sessions differ from the type of sessions created by the Session Initiation Protocol (SIP) [RFC3261] in several important ways. These sessions can be extremely long lived - running for hours or even days. An example is a lengthy coding session. They can also be highly intermittent with asynchronous responses. The protocol also requires conveyance of many modalities from one side to the other, including text, audio, video, and structured data. This content can be exchanged sporadically, spanning different transport connections and IP hosts.
+The widespread usage of AI Agents on the Internet has introduced new forms of networked communications. User agent clients connect to AI agents running elswehere, AI agents communicate with other AI agents, and AI agents communicate with tools. All three of these interaction patterns - and the many use cases therein - require a session-type protocol which handles lifecycle management, including creation, modification, deletion and so on - along with the exchange of input and output. These sessions can be extremely long lived - running for hours or even days - and span multiple IP hosts used by the both the principal and by the agent. They can also be highly intermittent with asynchronous responses. All of these mean a new type of session protocol is needed. 
 
-All of these mean a new type of session protocol is needed - the Agentic Communications Protocol (ACP).
+
+These sessions differ from the type of sessions created by the Session Initiation Protocol (SIP) [RFC3261], which are shorter lived and work between a single IP host for each participant. 
 
 This document introduces concepts, terminology, reference architecture and protocol functional blocks for ACP, which manages agentic dialogs. An agentic dialog is defined as a session between two parties - a principal whose role is to provide input to, and receive output from, an agent - and the agent, which is running a process which has properties which are agentic in nature. The agentic properties that are relevant here are (1) conversational contuity, and (2) driven by natural language in each direction. These concepts are discussed in more detail in this document.
 
@@ -219,35 +220,35 @@ Message:
 
 
 
-# Use Cases
+# Interaction Pattern
 
-We consider three core use cases, with sub-cases for each one.
+ACP targets three distinct interaction patterns. 
 
 ## User Agent to AI Agent
 
-In this case, a human user (which we'll just refer to as a user) is sitting in front of a desktop application, mobile application, or web application providing a user interface for engaging with an AI agent. The AI agent runs elsewhere - on a server - different from the user agent. In this use case, the user agent is really a "thin client" of sorts -  passing information from the user to the AI Agent, and passing information from the AI Agent to the user. This communications protocol would pass user messages, AI agent responses, meta-data like token usage, sub-agent spawns and completions, and so on. If the AI agent supports voice input and spoken output, the communications protocol would pass real-time voice information back and forth as well.  Basically - all of the information needed to render the UI. This use case is very similar to the way in which a SIP user agent talks to a SIP server.
+In this interaction pattern, a human user (which we'll just refer to as a user) is sitting in front of a desktop application, mobile application, or web application providing a user interface for engaging with an AI agent. The AI agent runs elsewhere - on a server - different from the user agent. In this pattern, the user agent is really a "thin client" of sorts -  passing information from the user to the AI Agent, and passing information from the AI Agent to the user. This communications protocol would pass user messages, AI agent responses, meta-data like token usage, sub-agent spawns and completions, and so on. If the AI agent supports voice input and spoken output, the communications protocol would pass real-time voice information back and forth as well.  Basically - all of the information needed to render the UI. 
 
 If the user agent is a thick desktop application, the communications protocol is from the user's desktop to the AI agent on the server. In a mobile app, it is from their mobile app to the AI agent on the server. If the user agent is a web application, it is most likely from the web server to the the server on which the AI agent is running.
 
-This use case is different from how desktop AI agents like Claude work today. Those have the AI agent running co-resident with the user interface. There is communications with a server elsewhere, but it takes the form of model invocation and tool invocation.
+This interaction pattern is different from how desktop AI agents like Claude work today. Those have the AI agent running co-resident with the user interface. There is communications with a server elsewhere, but it takes the form of model invocation and tool invocation.
 
 When the vendor of the AI agent is the same as the vendor of the user agent, there is not necessarily a need for standardized protocols between them. However, standardized protocols can be helpful in cases when the user agent is an embedded device made by a different vendor than the one making AI agents. For example, consider a case where a user has a smart speaker (similar to Amazon Alexa). However, the smart speaker is made by one vendor (say, Bose, who makes such devices), and the desire is to allow the smart speaker to connect with AI agents made by many vendors - Anthropic, OpenAI, Google, or even B2B AI agents. In this kind of case, when the cardinality of AI agent vendors is high, there is a strong need for a standardized protocol here.
 
 ## AI Agent to a Session Oriented Tool
 
-In this use case, an AI agent is running somewhere - a user's desktop, or perhaps on a server. The AI agent wishes to invoke a tool. However, this tool is not just a simple one that performs a request/response transaction. Examples of a simple input and output tool would be a traditional REST API, or a tool that is exposed through the A2T (Agent to Tool) protocol [I-D.rosenberg-aiproto-a2t]. These are transactional, stateless API calls. There is no session - nothing long lived.
+In this interaction pattern, an AI agent is running somewhere - a user's desktop, or perhaps on a server. The AI agent wishes to invoke a tool. However, this tool is not just a simple one that performs a request/response transaction. Examples of a simple input and output tool would be a traditional REST API, or a tool that is exposed through the A2T (Agent to Tool) protocol [I-D.rosenberg-aiproto-a2t]. These are transactional, stateless API calls. There is no session - nothing long lived.
 
 However, there are cases where the tool itself is session oriented. The primary example is the Model Context Protocol (MCP) which is session oriented. The tool might also be agentic in nature - taking structured data as input, providing it ultimately as output, but requiring interaction with the user back and forth in order to fulfill the request.
 
 ## AI Agent to AI Agent
 
-In this use case, two AI agents are running in different places. Perhaps they are made by different vendors but running in the same domain. An example might be an enterprise running AI agents from a CRM vendor, which communicate with AI agents made by a provisioning system vendor. They may be in different domains. Or they may be distinct agents made by the same vendor, split up into separate agents on different servers for reasons of scale or isolation.
+In this interaction pattern, two AI agents are running in different places. Perhaps they are made by different vendors but running in the same domain. An example might be an enterprise running AI agents from a CRM vendor, which communicate with AI agents made by a provisioning system vendor. They may be in different domains. Or they may be distinct agents made by the same vendor, split up into separate agents on different servers for reasons of scale or isolation.
 
-This is the core use case for A2A {A2A}.
+This is the core interaction pattern for A2A {A2A}.
 
 # Core Concept: Agentic Dialog
 
-When we look at all of the use cases, there is a common theme which runs through all of them - the notion of a long-lived session between two entities, with a growing context window as the interaction progresses, with a defined start and eventual finish. That's a mouthful, so we propose a specific name for this - an agentic dialog.
+When we look at all of the interaction patterns, there is a common theme which runs through all of them - the notion of a long-lived session between two entities, with a growing context window as the interaction progresses, with a defined start and eventual finish. That's a mouthful, so we propose a specific name for this - an agentic dialog.
 
 An agentic dialog is defined as a session between two parties - a principal whose role is to provide input to, and receive output from, an agent - and the agent, which is running a process which has properties which are agentic in nature. The agentic properties that are relevant here are (1) conversational contuity, and (2) driven by natural language in each direction.
 
