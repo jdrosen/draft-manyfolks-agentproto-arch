@@ -475,6 +475,8 @@ the Agent Communication Protocol needs to associate with a dialog so that
 existing authorization mechanisms can be applied at the points where they
 matter.
 
+ACP relies on objects defined by other standards to convey authorization and identities. In this way, it is extensible and modular to evolving work in this area in the OAuth working group. 
+
 ### Delegation {#delegation}
 
 Delegation is an act between participants, not a property of a
