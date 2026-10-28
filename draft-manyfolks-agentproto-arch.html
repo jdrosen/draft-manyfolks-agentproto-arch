@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta content="Common,Latin" name="scripts">
 <meta content="initial-scale=1.0" name="viewport">
-<title>Terminology, Framework and Architecture for the Agent Communications Protocol (ACP)</title>
+<title>Architecture for AI Agent Communications on the Internet</title>
 <meta content="Jonathan Rosenberg" name="author">
 <meta content="Zaheduzzaman Sarker" name="author">
 <meta content="Tirumaleswar Reddy" name="author">
@@ -12,7 +12,7 @@
 <meta content="Dapeng Liu" name="author">
 <meta content="Suresh Krishnan" name="author">
 <meta content="
-       The Agent Communications Protocol (ACP) - also known as agentproto - is a new protocol to be developed in the IETF. It is meant to be used between user agent clients and AI agents, or between AI Agents and other AI Agents, or between AI Agents and tools. All three of these use cases - and the many variations therein - all require a session-type protocol which handles lifecycle management, including creation, modification, deletion, and so on. These sessions differ from the type of sessions created by the Session Initiation Protocol (SIP) in several important ways. These sessions can be extremely long lived - running for hours or even days. An example is a lengthy coding session. They can also be highly intermittent with asynchronous responses. All of these mean a new type of session protocol is needed. This document introduces concepts, terminology, reference architecture and the protocol functional blocks for the Agentic Communications Protocol (ACP). 
+       This document defines the terminology and architecture for AI agent communications protocols over the Internet. It provides the foundational architectural elements for the Agent Communications Protocol (ACP) - also known as agentproto - a new protocol to be developed in the IETF. ACP enables communication between user agent clients and AI agents, between AI Agents and other AI Agents, or between AI Agents and tools. All three of these interaction patterns - and the many use cases therein - require a session-type protocol which handles lifecycle management, including creation, modification, deletion and so on - along with the exchange of input and output. These sessions can be extremely long lived - running for hours or even days - and span multiple IP hosts used by the both the principal and by the agent. They can also be highly intermittent with asynchronous responses. All of these mean a new type of session protocol is needed. 
     " name="description">
 <meta content="xml2rfc 3.34.1" name="generator">
 <meta content="AI" name="keyword">
@@ -1100,10 +1100,10 @@ svg {
 </dd>
 </dl>
 </div>
-<h1 id="title">Terminology, Framework and Architecture for the Agent Communications Protocol (ACP)</h1>
+<h1 id="title">Architecture for AI Agent Communications on the Internet</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">The Agent Communications Protocol (ACP) - also known as agentproto - is a new protocol to be developed in the IETF. It is meant to be used between user agent clients and AI agents, or between AI Agents and other AI Agents, or between AI Agents and tools. All three of these use cases - and the many variations therein - all require a session-type protocol which handles lifecycle management, including creation, modification, deletion, and so on. These sessions differ from the type of sessions created by the Session Initiation Protocol (SIP) in several important ways. These sessions can be extremely long lived - running for hours or even days. An example is a lengthy coding session. They can also be highly intermittent with asynchronous responses. All of these mean a new type of session protocol is needed. This document introduces concepts, terminology, reference architecture and the protocol functional blocks for the Agentic Communications Protocol (ACP).<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">This document defines the terminology and architecture for AI agent communications protocols over the Internet. It provides the foundational architectural elements for the Agent Communications Protocol (ACP) - also known as agentproto - a new protocol to be developed in the IETF. ACP enables communication between user agent clients and AI agents, between AI Agents and other AI Agents, or between AI Agents and tools. All three of these interaction patterns - and the many use cases therein - require a session-type protocol which handles lifecycle management, including creation, modification, deletion and so on - along with the exchange of input and output. These sessions can be extremely long lived - running for hours or even days - and span multiple IP hosts used by the both the principal and by the agent. They can also be highly intermittent with asynchronous responses. All of these mean a new type of session protocol is needed.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1175,7 +1175,7 @@ svg {
             <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-terminology" class="internal xref">Terminology</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-use-cases" class="internal xref">Use Cases</a></p>
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-interaction-pattern" class="internal xref">Interaction Pattern</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
                 <p id="section-toc.1-1.3.2.1.1" class="keepWithNext"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-user-agent-to-ai-agent" class="internal xref">User Agent to AI Agent</a></p>
@@ -1230,7 +1230,7 @@ svg {
                     <p id="section-toc.1-1.4.2.2.2.8.1"><a href="#section-4.2.8" class="auto internal xref">4.2.8</a>.  <a href="#name-client-vs-principal-and-ser" class="internal xref">Client vs Principal and Server vs. Agent</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.9">
-                    <p id="section-toc.1-1.4.2.2.2.9.1"><a href="#section-4.2.9" class="auto internal xref">4.2.9</a>.  <a href="#name-acp-doesnt-directly-transmi" class="internal xref">ACP Doesnt Directly Transmit Context</a></p>
+                    <p id="section-toc.1-1.4.2.2.2.9.1"><a href="#section-4.2.9" class="auto internal xref">4.2.9</a>.  <a href="#name-acp-manages-dialog-context-" class="internal xref">ACP Manages Dialog Context - not LLM Context</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.10">
                     <p id="section-toc.1-1.4.2.2.2.10.1"><a href="#section-4.2.10" class="auto internal xref">4.2.10</a>. <a href="#name-output-isnt-just-the-respon" class="internal xref">Output Isnt Just the Response</a></p>
@@ -1366,8 +1366,8 @@ svg {
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">The widespread usage of AI Agents on the Internet has introduced new forms of networked communications. User agent clients connect to AI agents running elswehere, AI agents communicate with other AI agents, and AI agents communicate with tools. All three of these use cases - and the many variations therein - all require a session-type protocol which handles lifecycle management, including creation, modification, deletion, cancellation, and so on. These sessions differ from the type of sessions created by the Session Initiation Protocol (SIP) <span>[<a href="#RFC3261" class="cite xref">RFC3261</a>]</span> in several important ways. These sessions can be extremely long lived - running for hours or even days. An example is a lengthy coding session. They can also be highly intermittent with asynchronous responses. The protocol also requires conveyance of many modalities from one side to the other, including text, audio, video, and structured data. This content can be exchanged sporadically, spanning different transport connections and IP hosts.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">All of these mean a new type of session protocol is needed - the Agentic Communications Protocol (ACP).<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-1">The widespread usage of AI Agents on the Internet has introduced new forms of networked communications. User agent clients connect to AI agents running elswehere, AI agents communicate with other AI agents, and AI agents communicate with tools. All three of these interaction patterns - and the many use cases therein - require a session-type protocol which handles lifecycle management, including creation, modification, deletion and so on - along with the exchange of input and output. These sessions can be extremely long lived - running for hours or even days - and span multiple IP hosts used by the both the principal and by the agent. They can also be highly intermittent with asynchronous responses. All of these mean a new type of session protocol is needed.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">These sessions differ from the type of sessions created by the Session Initiation Protocol (SIP) <span>[<a href="#RFC3261" class="cite xref">RFC3261</a>]</span>, which are shorter lived and work between a single IP host for each participant.<a href="#section-1-2" class="pilcrow">¶</a></p>
 <p id="section-1-3">This document introduces concepts, terminology, reference architecture and protocol functional blocks for ACP, which manages agentic dialogs. An agentic dialog is defined as a session between two parties - a principal whose role is to provide input to, and receive output from, an agent - and the agent, which is running a process which has properties which are agentic in nature. The agentic properties that are relevant here are (1) conversational contuity, and (2) driven by natural language in each direction. These concepts are discussed in more detail in this document.<a href="#section-1-3" class="pilcrow">¶</a></p>
 <p id="section-1-4">This document breaks ACP down into three functional blocks - agentic dialog management, authorization and delegation, and identity management. As a session-layer protocol, ACP rides ontop of transport protocols. This document identifies requirements of these transport protocols to aid in their selection.<a href="#section-1-4" class="pilcrow">¶</a></p>
 <p id="section-1-5">The use cases and requirements that drive this architecture are described in
@@ -1419,83 +1419,137 @@ The principal can be a human user (as in the user agent to AI agent case noted a
           <p id="section-2-1.12.1">Context is central to the concept of AI Agents. There are many definitions on the Internet. Anthropic defines it as "the set of tokens included when sampling from a large-language model (LLM)." <span>[<a href="#anthropic-context-def" class="cite xref">anthropic-context-def</a>]</span>. The goal of ACP is to exchange the input from the principal to allow the agent to manage context, and the output from inference of that context.<a href="#section-2-1.12.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-1.13">Agentic Dialog:</dt>
+<dt id="section-2-1.13">LLM Context:</dt>
         <dd style="margin-left: 1.5em" id="section-2-1.14">
-          <p id="section-2-1.14.1">A session between two parties - a principal whose role is to provide input to, and receive output from, an agent - and the agent, which is running a process which has properties which are agentic in nature and result in the maintenance of context. The agentic properties that are relevant here are (1) conversational contuity, and (2) driven by natural language in each direction. An agentic dialog is associated 1-1 with the context it builds. ACP doesn't define how the agent maintains the context; it merely allows for the establishment of an agentic dialog and exchange of data which allows the agent to do so.<a href="#section-2-1.14.1" class="pilcrow">¶</a></p>
+          <p id="section-2-1.14.1">Same as context. We used the adjective "LLM" in front of context to help differentiate LLM context from dialog context.<a href="#section-2-1.14.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-1.15">Agentic Dialog Identifier (ADID):</dt>
+<dt id="section-2-1.15">Agentic Dialog:</dt>
         <dd style="margin-left: 1.5em" id="section-2-1.16">
-          <p id="section-2-1.16.1">An identifier which identifies an agentic dialog and the context associated with it. This identifier survives network interruption or change.<a href="#section-2-1.16.1" class="pilcrow">¶</a></p>
+          <p id="section-2-1.16.1">A session between two parties - a principal whose role is to provide input to, and receive output from, an agent - and the agent, which is running a process which has properties which are agentic in nature and result in the maintenance of LLM context. The agentic properties that are relevant here are (1) conversational contuity, and (2) driven by natural language in each direction. An agentic dialog is associated 1-1 with the LLM context it builds. ACP doesn't define how the agent maintains the LLM context; it merely allows for the establishment of an agentic dialog and exchange of data which allows the agent to do so.<a href="#section-2-1.16.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-1.17">Modality:</dt>
+<dt id="section-2-1.17">Input:</dt>
         <dd style="margin-left: 1.5em" id="section-2-1.18">
-          <p id="section-2-1.18.1">A category of data exchanged in an agentic dialog, such as text, audio, image, video or structured data.<a href="#section-2-1.18.1" class="pilcrow">¶</a></p>
+          <p id="section-2-1.18.1">Information provided by the principal, which is used to drive the operation of the agent. In simplest terms, this is the stuff that the principal types or speaks to the AI agent, e.g., "I want to book a trip to Maui" or "That sounds like a good idea but what is the weather like that time of year?".<a href="#section-2-1.18.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-1.19">Progress Signaling:</dt>
+<dt id="section-2-1.19">Output:</dt>
         <dd style="margin-left: 1.5em" id="section-2-1.20">
-          <p id="section-2-1.20.1">A form of output from the agent which is informational in nature, but not strictly needed by the principal for determining what to do next. Examples include usage data, skill and tool invocation notifications, duration and token consumption updates, sub-agent launches and terminations, and so on.<a href="#section-2-1.20.1" class="pilcrow">¶</a></p>
+          <p id="section-2-1.20.1">The information produced by the agent which are meant to be conveyed to the principal. There are three distinct forms of output - response, information, and progress.<a href="#section-2-1.20.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-1.21">Administrative Domain:</dt>
+<dt id="section-2-1.21">Response Output:</dt>
         <dd style="margin-left: 1.5em" id="section-2-1.22">
-          <p id="section-2-1.22.1">A set of entities, such as agents, tools, and intermediaries, that are
-subject to a common authorization policy and a common authority.<a href="#section-2-1.22.1" class="pilcrow">¶</a></p>
+          <p id="section-2-1.22.1">This is the portion of the output which is meant to be shown to the user, and is what the user needs to know to decide their next input. For example, "I've booked that trip for you. Do you need a car too?". The output can of course constitute any modality.<a href="#section-2-1.22.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-1.23">Agent Identity:</dt>
+<dt id="section-2-1.23">Information Output:</dt>
         <dd style="margin-left: 1.5em" id="section-2-1.24">
-          <p id="section-2-1.24.1">Identity information associated with an AI agent, distinct from the
-identity of the user on whose behalf it acts, and used for
-authentication, authorization, and accountability.<a href="#section-2-1.24.1" class="pilcrow">¶</a></p>
+          <p id="section-2-1.24.1">This is the portion of the output which helps the principal understand what the agent has done, but is not necessarily required for them to compose their input. This includes tool call summaries, reasoning, sub-agent invocations, and so on. Information output is content that the agent used to build its local context but is not necessary for the principal to know.<a href="#section-2-1.24.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-1.25">Delegation:</dt>
+<dt id="section-2-1.25">Progress:</dt>
         <dd style="margin-left: 1.5em" id="section-2-1.26">
-          <p id="section-2-1.26.1">The act of an AI agent requesting another AI agent to execute a task on
-its behalf.<a href="#section-2-1.26.1" class="pilcrow">¶</a></p>
+          <p id="section-2-1.26.1">This is the portion of the output that provides updates on work to the principal. This includes token counts, time elapsed, usage progress, and so on. Progress output is informational in nature, like information output, but it has the important distinction that it is not data the agent used to build its LLM context. As a result, it is almost aways generated by the agent harness and not the LLM itself.<a href="#section-2-1.26.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-1.27">Tool:</dt>
+<dt id="section-2-1.27">Dialog Context:</dt>
         <dd style="margin-left: 1.5em" id="section-2-1.28">
-          <p id="section-2-1.28.1">A service invoked by an AI agent to retrieve data or perform operations.
-A tool is not necessarily an AI agent. However, in some cases a tool can be session-oriented in nature.<a href="#section-2-1.28.1" class="pilcrow">¶</a></p>
+          <p id="section-2-1.28.1">Dialog context refers to the state maintained by, and exchanged via, the ACP protocol. Each agentic dialog is associated 1-1 with an instance of dialog context. The dialog context has two primary elements - meta-data and the log. Meta-data is the set of information that is required for the operation of the protocol itself, and includes protocol identifiers (such as the Agentic Dialog Identifier (ADID)), participants along with their identifiers and roles, supported modalities, start time, and so on. The log is the append-only collection of the inputs provided by the principal, the outputs provided by the agent (inclusive of response, information and progress output). The log includes data across all modalities, including real-time voice and video, along with text, images and structured data.<a href="#section-2-1.28.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-1.29">Trust Boundary:</dt>
+<dt id="section-2-1.29">Log:</dt>
         <dd style="margin-left: 1.5em" id="section-2-1.30">
-          <p id="section-2-1.30.1">A boundary between administrative domains.<a href="#section-2-1.30.1" class="pilcrow">¶</a></p>
+          <p id="section-2-1.30.1">The portion of the dialog context that is the append-only sequence of input from the principal and output (response, information and progress) from the agent.<a href="#section-2-1.30.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-1.31">Intermediary:</dt>
+<dt id="section-2-1.31">Agentic Dialog Identifier (ADID):</dt>
         <dd style="margin-left: 1.5em" id="section-2-1.32">
-          <p id="section-2-1.32.1">An entity that relays or processes messages between agentic dialog participants.<a href="#section-2-1.32.1" class="pilcrow">¶</a></p>
+          <p id="section-2-1.32.1">An identifier which identifies an agentic dialog and the context associated with it. This identifier survives network interruption or change.<a href="#section-2-1.32.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-1.33">Message:</dt>
+<dt id="section-2-1.33">Modality:</dt>
         <dd style="margin-left: 1.5em" id="section-2-1.34">
-          <p id="section-2-1.34.1">A discrete unit of communication exchanged between agentic dialog participants.<a href="#section-2-1.34.1" class="pilcrow">¶</a></p>
+          <p id="section-2-1.34.1">A category of data exchanged in an agentic dialog, such as text, audio, image, video or structured data.<a href="#section-2-1.34.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.35">Progress Signaling:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.36">
+          <p id="section-2-1.36.1">The act of providing progress output from the agent to the principal.<a href="#section-2-1.36.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.37">Administrative Domain:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.38">
+          <p id="section-2-1.38.1">A set of entities, such as agents, tools, and principals, that are
+subject to a common authorization policy and a common authority.<a href="#section-2-1.38.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.39">Agent Identity:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.40">
+          <p id="section-2-1.40.1">Identity information associated with an AI agent, distinct from the
+identity of the user on whose behalf it acts, and used for
+authentication, authorization, and accountability.<a href="#section-2-1.40.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.41">Delegation:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.42">
+          <p id="section-2-1.42.1">The act of an AI agent requesting another AI agent to execute a task on
+its behalf.<a href="#section-2-1.42.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.43">Tool:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.44">
+          <p id="section-2-1.44.1">A service invoked by an AI agent to retrieve data or perform operations.
+A tool is not necessarily an AI agent. However, in some cases a tool can be session-oriented in nature.<a href="#section-2-1.44.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.45">Trust Boundary:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.46">
+          <p id="section-2-1.46.1">A boundary between administrative domains.<a href="#section-2-1.46.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.47">Message:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.48">
+          <p id="section-2-1.48.1">A discrete unit of communication exchanged between agentic dialog participants.<a href="#section-2-1.48.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
 </section>
 </div>
-<div id="use-cases">
+<div id="interaction-pattern">
 <section id="section-3">
-      <h2 id="name-use-cases">
-<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-use-cases" class="section-name selfRef">Use Cases</a>
+      <h2 id="name-interaction-pattern">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-interaction-pattern" class="section-name selfRef">Interaction Pattern</a>
       </h2>
-<p id="section-3-1">We consider three core use cases, with sub-cases for each one.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-1">ACP targets three distinct interaction patterns:<a href="#section-3-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3-2">
+<pre>
++-------------+
+| User /      |
+| Principal   |
++------+------+
+ (ACP) |
+       v
++-------------+        +--------+
+|  Agent (A)  |-------&gt;|  Tool  |
++------+------+ (ACP.  +--------+
+  (ACP)|         other)
+       V
++-------------+        +--------+
+|  Agent (A)  |-------&gt;|  Tool  |
++------+------+ (ACP,  +--------+
+                 other)
+</pre><a href="#section-3-2" class="pilcrow">¶</a>
+</div>
 <div id="user-agent-to-ai-agent">
 <section id="section-3.1">
         <h3 id="name-user-agent-to-ai-agent">
 <a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-user-agent-to-ai-agent" class="section-name selfRef">User Agent to AI Agent</a>
         </h3>
-<p id="section-3.1-1">In this case, a human user (which we'll just refer to as a user) is sitting in front of a desktop application, mobile application, or web application providing a user interface for engaging with an AI agent. The AI agent runs elsewhere - on a server - different from the user agent. In this use case, the user agent is really a "thin client" of sorts -  passing information from the user to the AI Agent, and passing information from the AI Agent to the user. This communications protocol would pass user messages, AI agent responses, meta-data like token usage, sub-agent spawns and completions, and so on. If the AI agent supports voice input and spoken output, the communications protocol would pass real-time voice information back and forth as well.  Basically - all of the information needed to render the UI. This use case is very similar to the way in which a SIP user agent talks to a SIP server.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-1">In this interaction pattern, a human user (which we'll just refer to as a user) is sitting in front of a desktop application, mobile application, or web application providing a user interface for engaging with an AI agent. The AI agent runs elsewhere - on a server - different from the user agent. In this pattern, the user agent is really a "thin client" of sorts -  passing information from the user to the AI Agent, and passing information from the AI Agent to the user. This communications protocol would pass user messages, AI agent responses, meta-data like token usage, sub-agent spawns and completions, and so on. If the AI agent supports voice input and spoken output, the communications protocol would pass real-time voice information back and forth as well.  Basically - all of the information needed to render the UI.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
 <p id="section-3.1-2">If the user agent is a thick desktop application, the communications protocol is from the user's desktop to the AI agent on the server. In a mobile app, it is from their mobile app to the AI agent on the server. If the user agent is a web application, it is most likely from the web server to the the server on which the AI agent is running.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
-<p id="section-3.1-3">This use case is different from how desktop AI agents like Claude work today. Those have the AI agent running co-resident with the user interface. There is communications with a server elsewhere, but it takes the form of model invocation and tool invocation.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+<p id="section-3.1-3">This interaction pattern is different from how desktop AI agents like Claude work today. Those have the AI agent running co-resident with the user interface. There is communications with a server elsewhere, but it takes the form of model invocation and tool invocation.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
 <p id="section-3.1-4">When the vendor of the AI agent is the same as the vendor of the user agent, there is not necessarily a need for standardized protocols between them. However, standardized protocols can be helpful in cases when the user agent is an embedded device made by a different vendor than the one making AI agents. For example, consider a case where a user has a smart speaker (similar to Amazon Alexa). However, the smart speaker is made by one vendor (say, Bose, who makes such devices), and the desire is to allow the smart speaker to connect with AI agents made by many vendors - Anthropic, OpenAI, Google, or even B2B AI agents. In this kind of case, when the cardinality of AI agent vendors is high, there is a strong need for a standardized protocol here.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1504,7 +1558,7 @@ A tool is not necessarily an AI agent. However, in some cases a tool can be sess
         <h3 id="name-ai-agent-to-a-session-orien">
 <a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-ai-agent-to-a-session-orien" class="section-name selfRef">AI Agent to a Session Oriented Tool</a>
         </h3>
-<p id="section-3.2-1">In this use case, an AI agent is running somewhere - a user's desktop, or perhaps on a server. The AI agent wishes to invoke a tool. However, this tool is not just a simple one that performs a request/response transaction. Examples of a simple input and output tool would be a traditional REST API, or a tool that is exposed through the A2T (Agent to Tool) protocol <span>[<a href="#I-D.rosenberg-aiproto-a2t" class="cite xref">I-D.rosenberg-aiproto-a2t</a>]</span>. These are transactional, stateless API calls. There is no session - nothing long lived.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.2-1">In this interaction pattern, an AI agent is running somewhere - a user's desktop, or perhaps on a server. The AI agent wishes to invoke a tool. However, this tool is not just a simple one that performs a request/response transaction. Examples of a simple input and output tool would be a traditional REST API, or a tool that is exposed through the A2T (Agent to Tool) protocol <span>[<a href="#I-D.rosenberg-aiproto-a2t" class="cite xref">I-D.rosenberg-aiproto-a2t</a>]</span>. These are transactional, stateless API calls. There is no session - nothing long lived.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
 <p id="section-3.2-2">However, there are cases where the tool itself is session oriented. The primary example is the Model Context Protocol (MCP) which is session oriented. The tool might also be agentic in nature - taking structured data as input, providing it ultimately as output, but requiring interaction with the user back and forth in order to fulfill the request.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1513,8 +1567,8 @@ A tool is not necessarily an AI agent. However, in some cases a tool can be sess
         <h3 id="name-ai-agent-to-ai-agent">
 <a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-ai-agent-to-ai-agent" class="section-name selfRef">AI Agent to AI Agent</a>
         </h3>
-<p id="section-3.3-1">In this use case, two AI agents are running in different places. Perhaps they are made by different vendors but running in the same domain. An example might be an enterprise running AI agents from a CRM vendor, which communicate with AI agents made by a provisioning system vendor. They may be in different domains. Or they may be distinct agents made by the same vendor, split up into separate agents on different servers for reasons of scale or isolation.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
-<p id="section-3.3-2">This is the core use case for A2A {A2A}.<a href="#section-3.3-2" class="pilcrow">¶</a></p>
+<p id="section-3.3-1">In this interaction pattern, two AI agents are running in different places. Perhaps they are made by different vendors but running in the same domain. An example might be an enterprise running AI agents from a CRM vendor, which communicate with AI agents made by a provisioning system vendor. They may be in different domains. Or they may be distinct agents made by the same vendor, split up into separate agents on different servers for reasons of scale or isolation.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+<p id="section-3.3-2">This is the core interaction pattern for A2A {A2A}.<a href="#section-3.3-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1524,9 +1578,9 @@ A tool is not necessarily an AI agent. However, in some cases a tool can be sess
       <h2 id="name-core-concept-agentic-dialog">
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-core-concept-agentic-dialog" class="section-name selfRef">Core Concept: Agentic Dialog</a>
       </h2>
-<p id="section-4-1">When we look at all of the use cases, there is a common theme which runs through all of them - the notion of a long-lived session between two entities, with a growing context window as the interaction progresses, with a defined start and eventual finish. That's a mouthful, so we propose a specific name for this - an agentic dialog.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-1">When we look at all of the interaction patterns, there is a common theme which runs through all of them - the notion of a long-lived session between two entities, with a growing context window as the interaction progresses, with a defined start and eventual finish. That's a mouthful, so we propose a specific name for this - an agentic dialog.<a href="#section-4-1" class="pilcrow">¶</a></p>
 <p id="section-4-2">An agentic dialog is defined as a session between two parties - a principal whose role is to provide input to, and receive output from, an agent - and the agent, which is running a process which has properties which are agentic in nature. The agentic properties that are relevant here are (1) conversational contuity, and (2) driven by natural language in each direction.<a href="#section-4-2" class="pilcrow">¶</a></p>
-<p id="section-4-3">The principal can be a human user (as in the user agent to AI agent case noted above), but the principal can also be an AI agent - as in the A2A case. The agent is typically an AI Agent, but it could be another human,  with that human being receiving the input and providing output. In this way, the term "agent" defined here refers strictly to the role in the protocol, which can be fulfilled by a human agent, an AI agent, or even traditional software. Indeed, in the A2T case, the agent might be a piece of software which supports only a small amount of capabilities.<a href="#section-4-3" class="pilcrow">¶</a></p>
+<p id="section-4-3">The principal can be a human user (as in the user agent to AI agent case noted above), but the principal can also be an AI agent - as in the A2A case. The agent is typically an AI Agent, but it could be another human,  with that human being receiving the input and providing output. In this way, the term "agent" defined here refers strictly to the role in the protocol, which can be fulfilled by a human agent, an AI agent, or even traditional software. Indeed, in the A2T case, the agent might be a piece of software which supports only a small amount of conversational capability.<a href="#section-4-3" class="pilcrow">¶</a></p>
 <p id="section-4-4">The agentic dialog is facilitated by a protocol, which runs between a client (acting on behalf of the principal) and a server (acting on behalf of the agent). These distinctions are important, because the protocol needs to communicate information which is sometimes relevant only to the client (such as an identifier for the agentic dialog), and sometimes information relevant only to the principal - such as the text that is communicated. This layering is similar to how other Internet protocols operate, e.g, email - which has distinct concepts of envelope (meant for the mail agent) and the body (relevant for the recipient).<a href="#section-4-4" class="pilcrow">¶</a></p>
 <div id="definitional-properties">
 <section id="section-4.1">
@@ -1539,9 +1593,9 @@ A tool is not necessarily an AI agent. However, in some cases a tool can be sess
           <h4 id="name-conversational-continuity">
 <a href="#section-4.1.1" class="section-number selfRef">4.1.1. </a><a href="#name-conversational-continuity" class="section-name selfRef">Conversational Continuity</a>
           </h4>
-<p id="section-4.1.1-1">Conversational continuity means that, as far as the principal is concerned, the output generated by the agent appears as if any output has propertly taken into account all of the prior inputs and outputs shared between them. Typically, this is accomplished through context that is built on the agent. The agent initializes context at the start of the dialog, and as the dialog progresses, the input and output are appended to that context. The context may be compacted if it gets too long, but the compaction serves the primary purpose of preserving continuity - retaining what is important so that, to the principal, it is almost as if there was no compaction or loss of information.<a href="#section-4.1.1-1" class="pilcrow">¶</a></p>
-<p id="section-4.1.1-2">The context is used by the agent to determine how to satisfy the needs of the principal as specified via input. Those needs may evolve over time.<a href="#section-4.1.1-2" class="pilcrow">¶</a></p>
-<p id="section-4.1.1-3">Conversational continuity means that the context is - in essence - a piece of state which must be referenced in all aspects of the protocol.<a href="#section-4.1.1-3" class="pilcrow">¶</a></p>
+<p id="section-4.1.1-1">Conversational continuity means that, as far as the principal is concerned, the output generated by the agent appears as if any output has propertly taken into account all of the prior inputs and outputs shared between them. Typically, this is accomplished through LLM context that is built on the agent. The agent initializes its LLM context at the start of the dialog, and as the dialog progresses, the LLM context evolves as the principal provides input, and the LLM performs inference. The LLM context may be compacted if it gets too long, but the compaction serves the primary purpose of preserving continuity - retaining what is important so that, to the principal, it is almost as if there was no compaction or loss of information.<a href="#section-4.1.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1.1-2">The LLM context is used by the agent to determine how to satisfy the needs of the principal as specified via input. Those needs may evolve over time.<a href="#section-4.1.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.1.1-3">Conversational continuity means that the LLM context is associated 1-1 with each agentic dialog that feeds it.<a href="#section-4.1.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="driven-by-natural-language">
@@ -1566,7 +1620,7 @@ A tool is not necessarily an AI agent. However, in some cases a tool can be sess
           <h4 id="name-it-has-a-start">
 <a href="#section-4.2.1" class="section-number selfRef">4.2.1. </a><a href="#name-it-has-a-start" class="section-name selfRef">It has a Start</a>
           </h4>
-<p id="section-4.2.1-1">Perhaps obvious but worth stating. The agentic dialog has a start. This start is the point at which the context is initialized. It may not be initialized as empty; the agent might use the identity of the principal to add personalization. Or, it may be a coding agent which reads an agents.md file to initialize what it is doing. It might read system instructions. For the agent to behave properly, it needs to be told that a particular agentic dialog is starting.<a href="#section-4.2.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.1-1">Perhaps obvious but worth stating. The agentic dialog has a start. This start is the point at which the dialog context and LLM context are both initialized. The LLM context may not be initialized as empty; the agent might use the identity of the principal to add personalization. Or, it may be a coding agent which reads an agents.md file to initialize what it is doing. It might read system instructions. For the agent to behave properly, it needs to be told that a particular agentic dialog is starting. The log portion of the dialog context is, however, initialized as empty.<a href="#section-4.2.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="it-may-be-long-lived">
@@ -1574,7 +1628,7 @@ A tool is not necessarily an AI agent. However, in some cases a tool can be sess
           <h4 id="name-it-may-be-long-lived">
 <a href="#section-4.2.2" class="section-number selfRef">4.2.2. </a><a href="#name-it-may-be-long-lived" class="section-name selfRef">It may be Long Lived</a>
           </h4>
-<p id="section-4.2.2-1">The agentic dialog may last a really long time. By "last" we mean that the context which is its defining property, may continue to exist and be accessible by the principal for long periods of time.<a href="#section-4.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.2-1">The agentic dialog may last a really long time. By "last" we mean that the dialog context which is its defining property, may continue to exist and be accessible by the principal for long periods of time.<a href="#section-4.2.2-1" class="pilcrow">¶</a></p>
 <p id="section-4.2.2-2">One example is an agentic dialog between a principal and agent that is used for a therapy session. A human user is connected to a client on their desktop; the server is running an AI agent which acts as a virtual therapist. The agentic dialog continues for months.<a href="#section-4.2.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1601,7 +1655,7 @@ A tool is not necessarily an AI agent. However, in some cases a tool can be sess
           <h4 id="name-it-might-or-might-not-end">
 <a href="#section-4.2.5" class="section-number selfRef">4.2.5. </a><a href="#name-it-might-or-might-not-end" class="section-name selfRef">It Might or Might Not End</a>
           </h4>
-<p id="section-4.2.5-1">Agentic dialogs can have a formal end, in which case it is not possible for the principal to contribute further to it. If an agentic dialog ends but is actually resumable, it hasnt really ended. Since the agent takes ownership for continued maintenance of context, it needs the ability to declare that it is no longer supporting this context, and ending the dialog. Similarly, a principal should be able to say "I'm done" giving permission for the agent to immediately delete the context associated with the agentic dialog.<a href="#section-4.2.5-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.5-1">Agentic dialogs can have a formal end, in which case it is not possible for the principal to contribute further to it. If an agentic dialog ends but is actually resumable, it hasnt really ended. Since the agent takes ownership for continued maintenance of both the dialog and LLM context, it needs the ability to declare that it is no longer supporting this context, and ending the dialog. Similarly, a principal should be able to say "I'm done" giving permission for the agent to immediately delete the context associated with the agentic dialog.<a href="#section-4.2.5-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="output-can-be-asynchronous">
@@ -1630,17 +1684,18 @@ A tool is not necessarily an AI agent. However, in some cases a tool can be sess
           </h4>
 <p id="section-4.2.8-1">There is a distinction between the principal and the client. The principal exists outside of the protocol; the role of the protocol is to collect input from the principal, and to provide output back to the principal. In traditional protocols we'd use the word "user" to represent the human driving the protocol, and not "principal". However, that terminology doesn't work here because the principal can be an AI agent which is not a human being. The word "principal" is agnostic to whether it is a human being or an AI Agent. The software element - and it is a piece of traditional software implementing ACP - is called the client.<a href="#section-4.2.8-1" class="pilcrow">¶</a></p>
 <p id="section-4.2.8-2">In the same way, the "agent" exists outside of the protocol as well. It is an AI agent, though it could be a human being. The server is the piece of software - also traditional software - which implements ACP and is responsible for funneling information to and from the AI Agent.<a href="#section-4.2.8-2" class="pilcrow">¶</a></p>
-<p id="section-4.2.8-3">This distinction is important because it helps us understand how to properly layer the system. The context is a core property of the agent, NOT of the server. In ACP,  we are conveying information to and from the agent on the server, but the context lives with the agent. The protocol will concern itself with technical conveyance issues -  such as retransmissions and reconnection - but it is not a database system and the context itself is not directly accessed by this protocol.<a href="#section-4.2.8-3" class="pilcrow">¶</a></p>
+<p id="section-4.2.8-3">This distinction is important because it helps us understand how to properly layer the system.<a href="#section-4.2.8-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="acp-doesnt-directly-transmit-context">
+<div id="acp-manages-dialog-context-not-llm-context">
 <section id="section-4.2.9">
-          <h4 id="name-acp-doesnt-directly-transmi">
-<a href="#section-4.2.9" class="section-number selfRef">4.2.9. </a><a href="#name-acp-doesnt-directly-transmi" class="section-name selfRef">ACP Doesnt Directly Transmit Context</a>
+          <h4 id="name-acp-manages-dialog-context-">
+<a href="#section-4.2.9" class="section-number selfRef">4.2.9. </a><a href="#name-acp-manages-dialog-context-" class="section-name selfRef">ACP Manages Dialog Context - not LLM Context</a>
           </h4>
-<p id="section-4.2.9-1">The ACP protocol is not actually directly transmitting context. The naive way to think about context is that it is just a growing log that contenates each piece of input sent from principal to agent, and each output from agent to principal. But, this is not the case.<a href="#section-4.2.9-1" class="pilcrow">¶</a></p>
-<p id="section-4.2.9-2">Firstly, the context is usually initialized with system instructions, which are never seen by the principal and never need to be seen by them. These are never transmitted on the wire by ACP, yet are part of context. Similarly, if an agent loads a skill, the skill details are added to the context. However, those details are not transmitted over the wire. Indeed, skills might be considered proprietary and it is an explicit goal of the vendor of the agent to not send them to anyone who uses the agent!<a href="#section-4.2.9-2" class="pilcrow">¶</a></p>
-<p id="section-4.2.9-3">What ACP does exchange, is input and output. Input is information the principal wishes to send to the agent, and output is information the agent wishes to send to the principal.<a href="#section-4.2.9-3" class="pilcrow">¶</a></p>
+<p id="section-4.2.9-1">The ACP protocol is not directly transmitting LLM context. The naive way to think about LLM context is that it is just a growing log that concatenates each piece of input sent from principal to agent, and each output from agent to principal. If that were true, there would be no distinction between the dialog context and LLM context. But, this is not the case.<a href="#section-4.2.9-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.9-2">Firstly, the LLM context is usually initialized with system instructions, which are never seen by the principal and never need to be seen by them. These are never transmitted on the wire by ACP, and do not form part of the dialog context. Similarly, if an agent loads a skill, the skill details are added to the context. However, those details are not transmitted over the wire by ACP, nor are they added to the dialog context. The dialog context would just indicate that the skill was loaded. Indeed, skills might be considered proprietary and it is an explicit goal of the vendor of the agent to not send them to anyone who uses the agent!<a href="#section-4.2.9-2" class="pilcrow">¶</a></p>
+<p id="section-4.2.9-3">What ACP does exchange, is input and output. Input is information the principal wishes to send to the agent, and output is information the agent wishes to send to the principal. The input and output are appended to form the log, the main part of the dialog context.<a href="#section-4.2.9-3" class="pilcrow">¶</a></p>
+<p id="section-4.2.9-4">The distinction between LLM context and dialog context also aligns with the distinction between server and agent. The LLM context is a core property of the agent, NOT of the server, whereas the dialog context is a property of the server, and not its associated agent. In ACP,  we are conveying information to and from the agent on the server, but the LLM context lives with the agent. The protocol will concern itself with technical conveyance issues necessary to make sure both client and server have an aligned view of the dialog context. But, how that dialog context is related to the LLM context is a matter of local implementation.<a href="#section-4.2.9-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="output-isnt-just-the-response">
@@ -1648,28 +1703,19 @@ A tool is not necessarily an AI agent. However, in some cases a tool can be sess
           <h4 id="name-output-isnt-just-the-respon">
 <a href="#section-4.2.10" class="section-number selfRef">4.2.10. </a><a href="#name-output-isnt-just-the-respon" class="section-name selfRef">Output Isnt Just the Response</a>
           </h4>
-<p id="section-4.2.10-1">The most obvious form of output of the response to be processed by the principal. For example:<a href="#section-4.2.10-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-4.2.10-2">
-<pre>
-Principal: What is the capital of New York?
-Agent: It is Albany.
-</pre><a href="#section-4.2.10-2" class="pilcrow">¶</a>
-</div>
-<p id="section-4.2.10-3">The words "It is Albany" clearly are output from the agent and need to be conveyed by ACP.<a href="#section-4.2.10-3" class="pilcrow">¶</a></p>
-<p id="section-4.2.10-4">However, the output from the agent also includes meta-data, usually emitted from the harness and not from the LLM itself. These include:<a href="#section-4.2.10-4" class="pilcrow">¶</a></p>
+<p id="section-4.2.10-1">The output has three distinct elements:<a href="#section-4.2.10-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-4.2.10-5.1">
-              <p id="section-4.2.10-5.1.1">Tokens spent<a href="#section-4.2.10-5.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-4.2.10-2.1">
+              <p id="section-4.2.10-2.1.1">Responses: This is the output of the agent which needs to be rendered to the principal for them to make a decision on what to do next. Examples include text responses, like "I've booked that trip for you, do you need a car?", images - such as a photo of a hotel or a rendered image from an image-generation agent, real-time voice - used by live agents that interact with principals over real-time voice, common in contact center applications for example, real-time video - an emerging output modality used by agents that are represented by talking-heads, able to move their mouths, make facial expressions and so on. Of course, it also includes structured data - for example a JSON object or HTML page.<a href="#section-4.2.10-2.1.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-4.2.10-5.2">
-              <p id="section-4.2.10-5.2.1">Indication that a skill was loaded or tool was invoked<a href="#section-4.2.10-5.2.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-4.2.10-2.2">
+              <p id="section-4.2.10-2.2.1">Information: This is the output of the agent which is useful for the principal to know, and is used by the agent as part of its LLM context - but is not necesarily essential for the principal to observe in order to determine their next input. Examples of this include tool calls, sub-agent invocations, and reasoning.<a href="#section-4.2.10-2.2.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-4.2.10-5.3">
-              <p id="section-4.2.10-5.3.1">Progress updates on the work of sub-agents<a href="#section-4.2.10-5.3.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-4.2.10-2.3">
+              <p id="section-4.2.10-2.3.1">Progress: Whereas information output is generated by the LLM and fed back into the agents internal context, progress is data generated by the harness and is useful to understand status. This includes token counts, turn durations, and costs.<a href="#section-4.2.10-2.3.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-4.2.10-6">This meta-data - which we'll call Progress Signaling - is needed to power a UI or to support logging and troubleshooting, but is not necessary for determination by the principal of the next input. In other words - its purely informational.<a href="#section-4.2.10-6" class="pilcrow">¶</a></p>
-<p id="section-4.2.10-7">ACP needs to convey both of these types of output - progress signaling and results.<a href="#section-4.2.10-7" class="pilcrow">¶</a></p>
+<p id="section-4.2.10-3">It is important to note that a piece of output in the dialog context is not necessarily exactly the same as what the agent adds to LLM context. For example, the agent may apply obfuscation to sensitive tool call results. Or, it may simplify the tool call output to facilitate comprehension by the principal, by omitting unimportant fields (a trace ID for example).<a href="#section-4.2.10-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1684,16 +1730,24 @@ Agent: It is Albany.
 <p id="section-5-1">From these properties, we can draw a network architecture diagram which describes the entities between which ACP works.<a href="#section-5-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-5-2">
 <pre>
-                                                     +---------+
-                                                     | Context |
-              +---------+    +---+    +---------+    +----+----+
-            +-+ Client  +----+   +----+ Server  +-+       |
+
+
+                                      +---------+    +---------+
+                                      | Dialog  |    |   LLM   |
+                                      | Context |    | Context |
+                                      +---------+    +---------+
+                                           |              |
+              +---------+    +---+    +---------+         |
+              | Client  |    |   |    | Server  |
+            +-+         +----+   +----+         +-+       |
             | +---------+    |   |    +---------+ |       |
 +---------+ | +---------+    |   |    +---------+ |  +----+----+
-|Principal+-+-+ Client  +----+IP +----+ Server  +-+--+ Agent   |
+|Principal+-+-+ Client  +----+IP +----+ Server  +-+--+  Agent  |
+|         | | |         |    |   |    |         | |  |         |
 +---------+ | +---------+    |Net|    +---------+ |  +---------+
             | +---------+    |   |    +---------+ |
             +-+ Client  +----+   +----+ Server  +-+
+              |         |    |   |    |         |
               +---------+    +---+    +---------+
 
                         &lt;-----ACP-----&gt;
@@ -1703,7 +1757,7 @@ Agent: It is Albany.
 <p id="section-5-3">The principal accesses the agent through one or more distinct clients over the lifetime of a specific agentic dialog. The notion of "distinct" here is that they can reside on different IP hosts. As noted in the examples above, in an A2A use case, the client might be on a virtual compute node A with a specific IP today, and then tomorrow the principal (an AI agent in this case) resumes the dialog from a different virtual compute node B with a different IP.<a href="#section-5-3" class="pilcrow">¶</a></p>
 <p id="section-5-4">In the same way, a particular named agent - and any instance of an agentic dialog created with that agent - can be accessed through a multiplicity of distinct servers - each of which is on a distinct host.<a href="#section-5-4" class="pilcrow">¶</a></p>
 <p id="section-5-5">ACP, as an on-the-wire protocol, runs over an IP network between the clients and servers.<a href="#section-5-5" class="pilcrow">¶</a></p>
-<p id="section-5-6">The ACP protocol is fundamentally two-party - it is between a principal and an agent. More complex topologies are supported by cascading together multiple independent agentic dialogs. For example, a user might connect to a an agent for banking, and that agent connects to a second agent for a mortgage quote. In this case, there are two distinct agentic dialogs, two unrelated instances of ACP. They are connected only through delegated identities that are passed from one to the other.<a href="#section-5-6" class="pilcrow">¶</a></p>
+<p id="section-5-6">The ACP protocol is fundamentally two-party - it is between a principal and an agent. More complex topologies are supported by cascading together multiple independent agentic dialogs. For example, a user might connect to a an agent for banking, and that agent connects to a second agent for a mortgage quote. In this case, there are two distinct agentic dialogs, two unrelated instances of ACP. They are connected only through delegated identities and the chain of dialog context identifiers that are passed from one to the other.<a href="#section-5-6" class="pilcrow">¶</a></p>
 <p id="section-5-7">The clients and servers exist on IP hosts. The agent in the picture is conceptual in nature, and is not an IP host. It might be a human, but most often is an AI agent composed of a harness and LLM, building and using context fed by the input received from the server.<a href="#section-5-7" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1728,6 +1782,24 @@ Agent: It is Albany.
 | | - Recovery       | |                  | | - Credential     | |
 | |                  | |                  | |   reference      | |
 | +--------+---------+ +---------+--------+ +---------+--------+ |
+|                         Dialog Context                         |
++----------------------------------------------------------------+
+                                |
+                                v
++----------------------------------------------------------------+
+|                          Transport                             |
+|  - Multiplexed Streams                                         |
+|  - Per-stream Semantics                                        |
+|  - Connection continuity (Connection ID, TLS resumption)       |
+|  - Protocols: HTTP, QUIC, WebTransport, WebRTC, MoQT           |
++----------------------------------------------------------------+
+                                 |
+                                 v
++----------------------------------------------------------------+
+|                       Security                                 |
+|  - Channel Protection                                          |
+|  - Mutual Authentication                                       |
+|  - Protocol: TLS 1.3, WIT/WPT                                  |
 +----------------------------------------------------------------+
 </pre><a href="#section-6-2" class="pilcrow">¶</a>
 </div>
@@ -1737,9 +1809,8 @@ Agent: It is Albany.
 <a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-agentic-dialog-management" class="section-name selfRef">Agentic Dialog Management</a>
         </h3>
 <p id="section-6.1-1">Agentic dialog management is the central role of the protocol.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
-<p id="section-6.1-2">Its role is to identify an agentic dialog, to provide lifecycle management for it, to exchange input and output used to grow context on the agent, and to allow the agentic dialog to continue through the failure of clients, servers and network throughout its lifecycle. It can work within a single trust domain, or across trust domains.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
-<p id="section-6.1-3">It is the building block
-that allows a dialog context to remain recognizable over multiple hops, over time,
+<p id="section-6.1-2">Its role is to identify an agentic dialog, to provide lifecycle management for it, to exchange input and output used to grow dialog context, and to allow the agentic dialog to continue through the failure of clients, servers and network throughout its lifecycle. It can work within a single trust domain, or across trust domains.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.1-3">It is the building block that allows a dialog context to remain recognizable over multiple hops, over time,
 and across transport connections.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
 <div id="dialog-id">
 <section id="section-6.1.1">
@@ -1749,8 +1820,7 @@ and across transport connections.<a href="#section-6.1-3" class="pilcrow">¶</a>
 <p id="section-6.1.1-1">Every agentic dialog is required to have an agentic dialog identifier (ADID). The identifier is required to:<a href="#section-6.1.1-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.1.1-2.1">
-              <p id="section-6.1.1-2.1.1">correlate all messages that belong to the agentic dialog, in every direction and at
-every hop;<a href="#section-6.1.1-2.1.1" class="pilcrow">¶</a></p>
+              <p id="section-6.1.1-2.1.1">correlate all messages that belong to the agentic dialog, in each direction<a href="#section-6.1.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-6.1.1-2.2">
               <p id="section-6.1.1-2.2.1">survive the loss or replacement of a transport connection, so that the
@@ -1758,13 +1828,10 @@ agentic dialog is not tied to a TCP connection, QUIC connection, or TLS
 association;<a href="#section-6.1.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-6.1.1-2.3">
-              <p id="section-6.1.1-2.3.1">be usable by an intermediary to correlate the requests it receives with the
-requests it forwards, without access to task context.<a href="#section-6.1.1-2.3.1" class="pilcrow">¶</a></p>
+              <p id="section-6.1.1-2.3.1">be usable by an entity to link to distinct agentic dialogs, where one is triggered based on the other - for example, in sub-agent delegation.<a href="#section-6.1.1-2.3.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-6.1.1-3">A dialog can involve more than two participants, such as delegated agents,
-intermediaries, or members of a group. The dialog context identifier is therefore not
-required to imply a client-server relationship between participants [OPEN ISSUE].<a href="#section-6.1.1-3" class="pilcrow">¶</a></p>
+<p id="section-6.1.1-3">The dialog identifier should be a UUID, unique in space and time, and unguessable. Knowledge of an ADID provides no information whatsoever about the agentic dialog. Knowledge of he ADID is also insufficient for a client to connect to the server and access the agentic dialog in any way - the client must also authenticate itself, and be authorized for such access.<a href="#section-6.1.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="lifecyle">
@@ -1778,23 +1845,21 @@ required to imply a client-server relationship between participants [OPEN ISSUE]
               <p id="section-6.1.2-2.1.1">Initiation: beginning a new agentic dialog<a href="#section-6.1.2-2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-6.1.2-2.2">
-              <p id="section-6.1.2-2.2.1">Termination: ending an agentic dialog<a href="#section-6.1.2-2.2.1" class="pilcrow">¶</a></p>
+              <p id="section-6.1.2-2.2.1">Termination: ending an agentic dialog such that it cannot be resumed<a href="#section-6.1.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-6.1.2-2.3">
               <p id="section-6.1.2-2.3.1">Suspension: Pausing input or output, so that there no longer remains any active transport level connection for exchaning that input or output. Suspension could be time based, or explicitly triggered.<a href="#section-6.1.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-6.1.2-2.4">
-              <p id="section-6.1.2-2.4.1">Resumption: Resuming input or output, requiring (if needed) creation or modification of transport connections to convey the input or output<a href="#section-6.1.2-2.4.1" class="pilcrow">¶</a></p>
+              <p id="section-6.1.2-2.4.1">Resumption: Resuming input or output, requiring (if needed) creation or modification of transport connections to convey the input or output. Resumption also requires protocol agreement on whether the client needs to replay prior input, or whether the server had already processed it.<a href="#section-6.1.2-2.4.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-6.1.2-2.5">
               <p id="section-6.1.2-2.5.1">Cancellation: cancellation of prior input<a href="#section-6.1.2-2.5.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-6.1.2-2.6">
-              <p id="section-6.1.2-2.6.1">Rehydration: If a new client instance starts up in the middle of the dialog, it may need to hydrate any input or output which had been sent or received but not yet made it to any local databases used for storage.<a href="#section-6.1.2-2.6.1" class="pilcrow">¶</a></p>
-</li>
           </ul>
-<p id="section-6.1.2-3">Agent interactions are often long-lived, interruption-prone, and delegated across multiple hops. Each agentic dialog is required to have an ADID that survives network interruption or change. If a transport connection is interrupted, an authorized agent uses the ADID to re-associate the existing agentic dialog with the newly formed connection, instead of initiating a new agentic dialog.  An intermediary uses the ADID to correlate the requests it receives with the requests it forwards. Neither function requires access to task context.<a href="#section-6.1.2-3" class="pilcrow">¶</a></p>
-<p id="section-6.1.2-4">Agentic Dialogs are defined above any transport protocol connection (TCP connection, QUIC connection) or TLS association. QUIC Connection ID and TLS resumption provide connection-level continuity; they preserve transport and cryptographic state, not agentic dialog state.<a href="#section-6.1.2-4" class="pilcrow">¶</a></p>
+<p id="section-6.1.2-3">Agent interactions are often long-lived, interruption-prone, and delegated across multiple hops. Each agentic dialog is required to have an ADID that survives network interruption or change. If a transport connection is interrupted, an agent uses the ADID to re-associate the existing agentic dialog with the newly formed connection, instead of initiating a new agentic dialog. Of course, proper authentication is also required - knowledge of the ADID is insufficient for the newly formed connection to be associated to the agentic dialog.<a href="#section-6.1.2-3" class="pilcrow">¶</a></p>
+<p id="section-6.1.2-4">Similarly, an agent performing delegation uses the ADID to correlate the agentic dialog it terminates, with the one it initiates.<a href="#section-6.1.2-4" class="pilcrow">¶</a></p>
+<p id="section-6.1.2-5">Agentic Dialogs are defined above any transport protocol connection (TCP connection, QUIC connection) or TLS association. QUIC Connection ID and TLS resumption provide connection-level continuity; they preserve transport and cryptographic state, not agentic dialog state.<a href="#section-6.1.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="exchange">
@@ -1816,6 +1881,7 @@ required to imply a client-server relationship between participants [OPEN ISSUE]
           </h4>
 <p id="section-6.1.4-1">As noted in {#network-arch}, ACP needs to handle the fact that the agentic dialog can work even when the client and the server move between IP hosts through the lifetime of the dialog.<a href="#section-6.1.4-1" class="pilcrow">¶</a></p>
 <p id="section-6.1.4-2">Similarly, ACP needs to provide recovery in case any of these hosts should fail during the agentic dialog. This can happen during the exchange of real-time media (e.g., a server fails while receiving the user's voice input), or during the transmission of non-real-time input (the client sends a text message, and the server failed while processing it, but before completion of that processing).<a href="#section-6.1.4-2" class="pilcrow">¶</a></p>
+<p id="section-6.1.4-3">ACP also needs to provide rehydration. If a new client instance starts up in the middle of the dialog, it may need to hydrate any input or output which had been sent or received but not yet made it to any local databases used for storage.<a href="#section-6.1.4-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="error-signaling">
@@ -1847,6 +1913,7 @@ authorization mechanism. It identifies the functions and the information that
 the Agent Communication Protocol needs to associate with a dialog so that
 existing authorization mechanisms can be applied at the points where they
 matter.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.2-2">ACP relies on objects defined by other standards to convey authorization and identities. In this way, it is extensible and modular to evolving work in this area in the OAuth working group.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
 <div id="delegation">
 <section id="section-6.2.1">
           <h4 id="name-delegation">
@@ -1868,13 +1935,22 @@ originally exercised;<a href="#section-6.2.1-2.1.1" class="pilcrow">¶</a></p>
           </ul>
 <p id="section-6.2.1-3">In multi-hop delegation, an agent can be the delegated agent for one hop and
 the delegating agent for the next. A delegating agent can re-delegate authority
-derived from the original principal. The delegation context associates these
-roles with the dialog so that each participant can determine who it is
-acting for and who is acting for it. A delegation can be revoked or terminated
-independently of the dialog in which it was used.<a href="#section-6.2.1-3" class="pilcrow">¶</a></p>
-<p id="section-6.2.1-4">The constraints in <a href="#intent-execution" class="auto internal xref">Section 7.3</a> and <a href="#delegation-chain" class="auto internal xref">Section 7.4</a> apply: the
+derived from the original principal. A delegation can be revoked or terminated
+independently of the agentic dialog in which it was used.<a href="#section-6.2.1-3" class="pilcrow">¶</a></p>
+<p id="section-6.2.1-4">In delegated use cases, there are two distinct agentic dialogs, each with a distinct dialog context and a distinct ADID. The first is between the principal and the delegating agent, and the second between the delegating agent and the delegated agent. We refer to the second of these as the delegated dialog context. The delegated dialog context has two additional pieces of meta-data - the ADID of the first dialog context, and the identity of the principal in the first context. The delegating agent is responsible for communicating these over ACP. Conceptually, it looks like this:<a href="#section-6.2.1-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-6.2.1-5">
+<pre>
+Principal --------------&gt; Delegating Agent --------------&gt; Delegated Agent
+              ADID:167                         ADID:293
+                                               ADID-Delegation-Chain: 167
+                                               Delegated-From: Principal
+
+</pre><a href="#section-6.2.1-5" class="pilcrow">¶</a>
+</div>
+<p id="section-6.2.1-6">ADID 167 refers to the agentic dialog between the principal and delegating agent. There is a separate agentic dialog, with ADID 293, between the delegating agent and the delegated agent. However, when the second agentic dialog is formed, the delegating agent provides the chain of prior ADIDs. In this case, there is just one - 167 - which refers to the agentic dialog which triggered it. THe delegating agent also conveys the identity of the principal on whose behalf they are operating, in this case it is the original principal.<a href="#section-6.2.1-6" class="pilcrow">¶</a></p>
+<p id="section-6.2.1-7">The constraints in <a href="#intent-execution" class="auto internal xref">Section 7.3</a> and <a href="#delegation-chain" class="auto internal xref">Section 7.4</a> apply: the
 authority passed at each hop is limited to the delegated task and is not
-broadened along the chain.<a href="#section-6.2.1-4" class="pilcrow">¶</a></p>
+broadened along the chain.<a href="#section-6.2.1-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1905,15 +1981,11 @@ whose behalf an agent acts;<a href="#section-6.3.1-2.1.1" class="pilcrow">¶</a>
               <p id="section-6.3.1-2.2.1">the agent identity, which is the identity of the agent itself and is
 distinct from that of the principal;<a href="#section-6.3.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-6.3.1-2.3">
-              <p id="section-6.3.1-2.3.1">the identity of an intermediary that relays or processes messages in the
-dialog.<a href="#section-6.3.1-2.3.1" class="pilcrow">¶</a></p>
-</li>
           </ul>
 <p id="section-6.3.1-3">Keeping these identities distinct is required so that a participant can
 distinguish the principal, the delegating agent, and the delegated agent, and so that accountability can be
 assigned to the right entity.<a href="#section-6.3.1-3" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-4">In multi-party use cases, such as when there is a "conference call" between two users and an AI agent, the AI agent will have a single context that is used across two distinct agentic dialogs! In this case, there are multiple principal identities.<a href="#section-6.3.1-4" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-4">In multi-party use cases, such as when there is a "conference call" between two users and an AI agent, there will be two distinct agentic dialogs, each with a distinct dialog context. However, the LLM context is shared, so that the agent is "seeing" the inputs from both principals, and both principals see the output from the agent. Each principal also needs to see the other's input. This introduces the need to associate the identity of the principal with each input, and the need for ACP to communicate input from the server, back to the client, that wasn't sent by the principal on that dialog.<a href="#section-6.3.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1942,7 +2014,7 @@ assigned to the right entity.<a href="#section-6.3.1-3" class="pilcrow">¶</a></
 <a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-channel-protection" class="section-name selfRef">Channel Protection</a>
         </h3>
 <p id="section-7.2-1">All agent communication is required to be encrypted and mutually authenticated. This architecture does not define a fallback to cleartext or unauthenticated operation.
-Authentication may operate at the transport layer, the application layer, or both. Transport-layer authentication works well when TLS connections are not terminated by intermediaries. In architectures involving proxies, application-layer authentication is required to maintain identity continuity across TLS termination points. The channel protection mechanism is required to be negotiated during transport connection establishment, with both endpoints authenticating before any message is exchanged.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+Authentication may operate at the transport layer, the application layer, or both. Transport-layer authentication works well when TLS connections are not terminated by intermediary IP hosts. In architectures involving proxies, application-layer authentication is required to maintain identity continuity across TLS termination points. The channel protection mechanism is required to be negotiated during transport connection establishment, with both endpoints authenticating before any message is exchanged.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="intent-execution">
@@ -2081,7 +2153,7 @@ identity; see <a href="#agent-identity" class="auto internal xref">Section 7.1</
 <a href="#section-10" class="section-number selfRef">10. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
 <p id="section-10-1">AI agents enlarge the attack surface: they act autonomously, delegate across administrative domains, and operate over long-lived dialogs that rely on long-standing delegated authority. This section highlights threats specific to the building blocks in this document; detailed mitigations are expected in the specifications of those building blocks.<a href="#section-10-1" class="pilcrow">¶</a></p>
-<p id="section-10-2">Delegated authority is the primary risk. A rogue or compromised agent may attempt to use delegated authority beyond the task it was granted, or to broaden it as it delegates onward. As required in <a href="#intent-execution" class="auto internal xref">Section 7.3</a> and <a href="#delegation-chain" class="auto internal xref">Section 7.4</a>, authority granted to an agent is scoped to the delegated task and cannot be broadened along the chain, and the delegation chain is verifiable at each hop so an intermediary cannot forge or escalate it.<a href="#section-10-2" class="pilcrow">¶</a></p>
+<p id="section-10-2">Delegated authority is the primary risk. A rogue or compromised agent may attempt to use delegated authority beyond the task it was granted, or to broaden it as it delegates onward. As required in <a href="#intent-execution" class="auto internal xref">Section 7.3</a> and <a href="#delegation-chain" class="auto internal xref">Section 7.4</a>, authority granted to an agent is scoped to the delegated task and cannot be broadened along the chain, and the delegation chain is verifiable at each hop so an agent on the chain cannot forge or escalate it.<a href="#section-10-2" class="pilcrow">¶</a></p>
 <p id="section-10-3">Valid credentials do not show that an agent runs on an uncompromised platform. Attestation allows a peer to assess the integrity of the agent's execution environment.<a href="#section-10-3" class="pilcrow">¶</a></p>
 <p id="section-10-4">QUIC and TLS 1.3 0-RTT data can be replayed by an attacker (Section 8 of <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>). Messages that trigger non-idempotent actions are not permitted in 0-RTT data.<a href="#section-10-4" class="pilcrow">¶</a></p>
 </section>
@@ -2091,10 +2163,7 @@ identity; see <a href="#agent-identity" class="auto internal xref">Section 7.1</
       <h2 id="name-privacy-considerations">
 <a href="#section-11" class="section-number selfRef">11. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
       </h2>
-<p id="section-11-1">Dialog context identifiers and dialog context persist across intermediaries and
-trust boundaries. An intermediary or other observer can use them to link
-interactions that would otherwise be separate and to track agent and user/principal's
-activity over time. The Agent Communication Protocol is expected to analyze
+<p id="section-11-1">The ADID is used to correlate together distinct agentic dialogs, when one of them triggers the next. This means entities which know the ADID could attempt to access dialog contexts they were not privvy to. The Agent Communication Protocol is expected to analyze
 these risks and specify mitigations, such as limiting the scope and
 lifetime of dialog context identifiers.<a href="#section-11-1" class="pilcrow">¶</a></p>
 <p id="section-11-2">Agent identity information is sensitive, particularly in multi-domain
