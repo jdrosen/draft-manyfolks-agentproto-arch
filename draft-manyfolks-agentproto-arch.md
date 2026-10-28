@@ -399,8 +399,7 @@ Agentic dialog management is the central role of the protocol.
 
 Its role is to identify an agentic dialog, to provide lifecycle management for it, to exchange input and output used to grow dialog context, and to allow the agentic dialog to continue through the failure of clients, servers and network throughout its lifecycle. It can work within a single trust domain, or across trust domains.
 
-It is the building block
-that allows a dialog context to remain recognizable over multiple hops, over time,
+It is the building block that allows a dialog context to remain recognizable over multiple hops, over time,
 and across transport connections.
 
 ### Agentic Dialog Identifier and Correlation {#dialog-id}
@@ -488,10 +487,10 @@ transport connection. The architecture distinguishes three roles:
 
 In multi-hop delegation, an agent can be the delegated agent for one hop and
 the delegating agent for the next. A delegating agent can re-delegate authority
-derived from the original principal. The delegating dialog context associates these
-roles with the agentic dialog so that each participant can determine who it is
-acting for and who is acting for it. A delegation can be revoked or terminated
+derived from the original principal. A delegation can be revoked or terminated
 independently of the agentic dialog in which it was used.
+
+In delegated use cases, there are two distinct agentic dialogs, each with a distinct dialog context. The first is between the principal and the delegating agent, and the second between the delegating agent and the delegated agent. We refer to the second of these as the delegated dialog context. The delegated dialog context has two additional pieces of meta-data - the ADID of the first dialog context, and the identity of the principal in the first context. The delegating agent is responsible for communicating these over ACP. 
 
 The constraints in {{intent-execution}} and {{delegation-chain}} apply: the
 authority passed at each hop is limited to the delegated task and is not
@@ -521,7 +520,7 @@ Keeping these identities distinct is required so that a participant can
 distinguish the principal, the delegating agent, and the delegated agent, and so that accountability can be
 assigned to the right entity.
 
-In multi-party use cases, such as when there is a "conference call" between two users and an AI agent, the AI agent will have a single LLM context that is used across two distinct dialogs contexts! In this case, there are multiple principal identities.
+In multi-party use cases, such as when there is a "conference call" between two users and an AI agent, there will be two distinct agentic dialogs, each with a distinct dialog context. However, the LLM context is shared, so that the agent is "seeing" the inputs from both principals, and both principals see the output from the agent. Each principal also needs to see the other's input. This introduces the need to associate the identity of the principal with each input, and the need for ACP to communicate input from the server, back to the client, that wasn't sent by the principal on that dialog. 
 
 # Security  {#security}
 
