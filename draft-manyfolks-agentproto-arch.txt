@@ -5,7 +5,7 @@
 Agent Communication Protocols                               J. Rosenberg
 Internet-Draft                                               jdrosen.net
 Intended status: Informational                                 Z. Sarker
-Expires: 1 May 2027                                             T. Reddy
+Expires: 2 May 2027                                             T. Reddy
                                                                    Nokia
                                                                   K. Yao
                                                             China Mobile
@@ -13,7 +13,7 @@ Expires: 1 May 2027                                             T. Reddy
                                                                  Alibaba
                                                              S. Krishnan
                                                                    Cisco
-                                                         28 October 2026
+                                                         29 October 2026
 
 
         Architecture for AI Agent Communications on the Internet
@@ -68,7 +68,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 1 May 2027.
+   This Internet-Draft will expire on 2 May 2027.
 
 Copyright Notice
 
@@ -337,7 +337,7 @@ Table of Contents
      (ACP)|         other)
           V
    +-------------+        +--------+
-   |  Agent (A)  |------->|  Tool  |
+   |  Agent (B)  |------->|  Tool  |
    +------+------+ (ACP,  +--------+
                     other)
 
