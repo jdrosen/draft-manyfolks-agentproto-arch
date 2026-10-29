@@ -28,13 +28,13 @@ Abstract
    developed in the IETF.  ACP enables communication between user agent
    clients and AI agents, between AI Agents and other AI Agents, or
    between AI Agents and tools.  All three of these interaction patterns
-   - and the many use cases therein - require a session-type protocol
+   - and the many use cases therein - require a session-like protocol
    which handles lifecycle management, including creation, modification,
    deletion and so on - along with the exchange of input and output.
-   These sessions can be extremely long lived - running for hours or
-   even days - and span multiple IP hosts used by the both the principal
-   and by the agent.  They can also be highly intermittent with
-   asynchronous responses.  All of these mean a new type of session
+   These session-like associations can be extremely long lived - running
+   for hours or even days - and span multiple IP hosts used by the both
+   the principal and by the agent.  They can also be highly intermittent
+   with asynchronous responses.  All of these mean a new type of
    protocol is needed.
 
 About This Document
@@ -103,10 +103,11 @@ Table of Contents
        4.2.4.  Output can be Delayed
        4.2.5.  It Might or Might Not End
        4.2.6.  Output can be Asynchronous
-       4.2.7.  Agents are Named
+       4.2.7.  Agents are Identified by a URI
        4.2.8.  Client vs Principal and Server vs. Agent
        4.2.9.  ACP Manages Dialog Context - not LLM Context
-       4.2.10. Output Isnt Just the Response
+       4.2.10. Log Content is Opaque to ACP
+       4.2.11. Output Isnt Just the Response
    5.  Network Architecture Diagram
    6.  Functional Decomposition
      6.1.  Agentic Dialog Management
@@ -130,7 +131,6 @@ Table of Contents
      8.1.  Delivery Semantics
      8.2.  Message Exchange Patterns
      8.3.  Priority and Scheduling
-     8.4.  Multiple Communication topologies
    9.  Applicability of Existing IETF Work
      9.1.  Profile or Extend
    10. Security Considerations
@@ -148,18 +148,18 @@ Table of Contents
    forms of networked communications.  User agent clients connect to AI
    agents running elswehere, AI agents communicate with other AI agents,
    and AI agents communicate with tools.  All three of these interaction
-   patterns - and the many use cases therein - require a session-type
+   patterns - and the many use cases therein - require a session-like
    protocol which handles lifecycle management, including creation,
    modification, deletion and so on - along with the exchange of input
-   and output.  These sessions can be extremely long lived - running for
-   hours or even days - and span multiple IP hosts used by the both the
-   principal and by the agent.  They can also be highly intermittent
-   with asynchronous responses.  All of these mean a new type of session
-   protocol is needed.
+   and output.  These session-like associations can be extremely long
+   lived - running for hours or even days - and span multiple IP hosts
+   used by the both the principal and by the agent.  They can also be
+   highly intermittent with asynchronous responses.  All of these mean a
+   new type of protocol is needed.
 
-   These sessions differ from the type of sessions created by the
-   Session Initiation Protocol (SIP) [RFC3261], which are shorter lived
-   and work between a single IP host for each participant.
+   These differ from the type of sessions created by the Session
+   Initiation Protocol (SIP) [RFC3261], which are shorter lived and work
+   between a single IP host for each participant.
 
    This document introduces concepts, terminology, reference
    architecture and protocol functional blocks for ACP, which manages
@@ -173,9 +173,9 @@ Table of Contents
 
    This document breaks ACP down into three functional blocks - agentic
    dialog management, authorization and delegation, and identity
-   management.  As a session-layer protocol, ACP rides ontop of
-   transport protocols.  This document identifies requirements of these
-   transport protocols to aid in their selection.
+   management.  As a session-like protocol, ACP rides ontop of transport
+   protocols.  This document identifies requirements of these transport
+   protocols to aid in their selection.
 
    The use cases and requirements that drive this architecture are
    described in [I-D.agentic-ai-usecases-requirements] and
@@ -225,21 +225,23 @@ Table of Contents
       set of tokens included when sampling from a large-language model
       (LLM)." [anthropic-context-def].  The goal of ACP is to exchange
       the input from the principal to allow the agent to manage context,
-      and the output from inference of that context.
+      and the output from inference of that context.  The context itself
+      is invisible to ACP.
 
    LLM Context:  Same as context.  We used the adjective "LLM" in front
       of context to help differentiate LLM context from dialog context.
 
-   Agentic Dialog:  A session between two parties - a principal whose
-      role is to provide input to, and receive output from, an agent -
-      and the agent, which is running a process which has properties
-      which are agentic in nature and result in the maintenance of LLM
-      context.  The agentic properties that are relevant here are (1)
-      conversational contuity, and (2) driven by natural language in
-      each direction.  An agentic dialog is associated 1-1 with the LLM
-      context it builds.  ACP doesn't define how the agent maintains the
-      LLM context; it merely allows for the establishment of an agentic
-      dialog and exchange of data which allows the agent to do so.
+   Agentic Dialog:  An association between two parties - a principal
+      whose role is to provide input to, and receive output from, an
+      agent - and the agent, which is running a process which has
+      properties which are agentic in nature and result in the
+      maintenance of LLM context.  The agentic properties that are
+      relevant here are (1) conversational contuity, and (2) driven by
+      natural language in each direction.  An agentic dialog is
+      associated with the LLM context it builds.  ACP doesn't define how
+      the agent maintains the LLM context; it merely allows for the
+      establishment of an agentic dialog and exchange of data which
+      allows the agent to do so.
 
    Input:  Information provided by the principal, which is used to drive
       the operation of the agent.  In simplest terms, this is the stuff
@@ -279,13 +281,14 @@ Table of Contents
       context has two primary elements - meta-data and the log.  Meta-
       data is the set of information that is required for the operation
       of the protocol itself, and includes protocol identifiers (such as
-      the Agentic Dialog Identifier (ADID)), participants along with
-      their identifiers and roles, supported modalities, start time, and
-      so on.  The log is the append-only collection of the inputs
-      provided by the principal, the outputs provided by the agent
-      (inclusive of response, information and progress output).  The log
-      includes data across all modalities, including real-time voice and
-      video, along with text, images and structured data.
+      the Agentic Dialog Identifier (ADID)), the identity of the
+      principal, identities of the principals in any delegation chain,
+      the URI for the agent, supported modalities, start time, and so
+      on.  The log is the append-only collection of the inputs provided
+      by the principal, the outputs provided by the agent (inclusive of
+      response, information and progress output).  The log includes data
+      across all modalities, including real-time voice and video, along
+      with text, images and structured data.
 
    Log:  The portion of the dialog context that is the append-only
       sequence of input from the principal and output (response,
@@ -318,8 +321,8 @@ Table of Contents
 
    Trust Boundary:  A boundary between administrative domains.
 
-   Message:  A discrete unit of communication exchanged between agentic
-      dialog participants.
+   Message:  A discrete unit of communication exchanged between the
+      principal and agent
 
 3.  Interaction Pattern
 
@@ -417,14 +420,14 @@ Table of Contents
 
    When we look at all of the interaction patterns, there is a common
    theme which runs through all of them - the notion of a long-lived
-   session between two entities, with a growing context window as the
-   interaction progresses, with a defined start and eventual finish.
+   association between two entities, with a growing context window as
+   the interaction progresses, with a defined start and eventual finish.
    That's a mouthful, so we propose a specific name for this - an
    agentic dialog.
 
-   An agentic dialog is defined as a session between two parties - a
-   principal whose role is to provide input to, and receive output from,
-   an agent - and the agent, which is running a process which has
+   An agentic dialog is defined as an association between two parties -
+   a principal whose role is to provide input to, and receive output
+   from, an agent - and the agent, which is running a process which has
    properties which are agentic in nature.  The agentic properties that
    are relevant here are (1) conversational contuity, and (2) driven by
    natural language in each direction.
@@ -452,8 +455,8 @@ Table of Contents
 
 4.1.  Definitional Properties
 
-   An agentic dialog is distinct from other types of sessions (like the
-   SIP dialog) because of two key properties.
+   An agentic dialog is distinct from typical protocol sessions - like a
+   SIP dialog - because of two key properties.
 
 4.1.1.  Conversational Continuity
 
@@ -462,19 +465,23 @@ Table of Contents
    has propertly taken into account all of the prior inputs and outputs
    shared between them.  Typically, this is accomplished through LLM
    context that is built on the agent.  The agent initializes its LLM
-   context at the start of the dialog, and as the dialog progresses, the
-   LLM context evolves as the principal provides input, and the LLM
-   performs inference.  The LLM context may be compacted if it gets too
-   long, but the compaction serves the primary purpose of preserving
-   continuity - retaining what is important so that, to the principal,
-   it is almost as if there was no compaction or loss of information.
+   context at the start of the dialog - perhaps even reusing a prior LLM
+   context - and as the dialog progresses, the LLM context evolves as
+   the principal provides input, and the LLM performs inference.  The
+   LLM context may be compacted if it gets too long, but the compaction
+   serves the primary purpose of preserving continuity - retaining what
+   is important so that, to the principal, it is almost as if there was
+   no compaction or loss of information.
 
    The LLM context is used by the agent to determine how to satisfy the
    needs of the principal as specified via input.  Those needs may
    evolve over time.
 
-   Conversational continuity means that the LLM context is associated
-   1-1 with each agentic dialog that feeds it.
+   As such, each agentic dialog is associated with the LLM context which
+   it feeds, and is fed by.  The protocol has no constraints on how an
+   agent associates the agentic dialog with LLM context.  Indeed, an
+   agent could decide to reuse LLM context across agentic dialogs, at
+   its discretion.
 
 4.1.2.  Driven by Natural Language
 
@@ -578,25 +585,25 @@ Table of Contents
    for these use cases with webhooks, requiring the client to run its
    own HTTP server.
 
-4.2.7.  Agents are Named
+4.2.7.  Agents are Identified by a URI
 
    When a principal establishes an agentic dialog with an agent, it is
-   attempting to do so to a particular named instance of the agent.
-   This named instance is, at the very least, associated with the vendor
-   of the agent.  "I want to connect to Claude" or "I want to talk to
-   the Walmart AI Agent".  However, there can be additional levels of
-   naming too.  One can imagine a vendor having different agents with
+   attempting to do so to a particular agent, identified by a URI.  The
+   usage of a URI allows an administrative domain to have as many agents
+   as it likes.  One can imagine a vendor having different agents with
    different personas - a contact center AI agent which handles sales
    vs. support, or a virtual knowledge worker from Salesforce that
-   handles accounting vs. one that handles legal issues.  Generally the
-   differing named agents vary by LLM model, but also through the
-   instructions, prompts, guardrails and other aspects of the harness
-   which define its behavior.
+   handles accounting vs. one that handles legal issues.  Different
+   agents may be distinct through differing LLM model, instructions,
+   prompts, guardrails and other aspects of the harness which define its
+   behavior.  How they differ is up to implementations and not defined
+   by ACP.
 
    When the principal connects to the agent through its client to
-   initiate an agentic dialog, the client needs to provide to the name
-   to the server, so the server can run the right named instance of the
-   agent.
+   initiate an agentic dialog, the client provides the URI of the agent
+   it is connecting to.  How the principal obtained that URI is outside
+   the scope of the protocol, and could come through provisioning,
+   hyperlinks, or discovery techniques.
 
 4.2.8.  Client vs Principal and Server vs. Agent
 
@@ -645,6 +652,14 @@ Table of Contents
    the agent wishes to send to the principal.  The input and output are
    appended to form the log, the main part of the dialog context.
 
+   ACP doesn't define how the agent evolves the LLM context based on the
+   input, nor does it define how the output from the agent is funnelled
+   into ACP.  This means that ACP is seeing just the "on-the-wire"
+   exchange, and that exchange is stored in the log that is part of the
+   dialog context.  The dialog context is associated 1-1 with the
+   agentic dialog.  However, the mapping of an agentic dialog to the LLM
+   context is a matter of local implementation.
+
    The distinction between LLM context and dialog context also aligns
    with the distinction between server and agent.  The LLM context is a
    core property of the agent, NOT of the server, whereas the dialog
@@ -656,7 +671,19 @@ Table of Contents
    context.  But, how that dialog context is related to the LLM context
    is a matter of local implementation.
 
-4.2.10.  Output Isnt Just the Response
+4.2.10.  Log Content is Opaque to ACP
+
+   The actual text, image, or video that form the input and output that
+   build up the log are not actually processed by ACP.  To ACP, they are
+   opaque.  ACP only cares about the meta-data of each log entry -
+   identifiers, timestamps, and so on - in order to support exchange,
+   synchronization, recovery and rehydration.  A good analogy is the RTP
+   protocol [RFC3550], which doesn't care about the payloads it conveys
+   - it just conveys them.  The actual content matter to the agent - and
+   more specifically - the LLM - which runs inference on it to
+   comprehend and respond.  ACP just wants to move the data around.
+
+4.2.11.  Output Isnt Just the Response
 
    The output has three distinct elements:
 
@@ -759,7 +786,7 @@ Table of Contents
    | | Management       | | and Delegation   | | Management       | |
    | |                  | |                  | |                  | |
    | | - Identifier     | | - Delegation     | | - Roles          | |
-   | | - Lifecycle      | | - Authorization  | | - Participant    | |
+   | | - Lifecycle      | | - Authorization  | | - Principal      | |
    | | - Exchange       | | - Decision point | |   identity       | |
    | | - Recovery       | |                  | | - Credential     | |
    | |                  | |                  | |   reference      | |
@@ -937,7 +964,7 @@ Table of Contents
 
 6.2.  Authorization and Delegation
 
-   Authorization and Delegation determines whether a participant is
+   Authorization and Delegation determines whether a principal is
    permitted to act within an agentic dialog and on whose behalf.  This
    sub-block does not define an authorization mechanism.  It identifies
    the functions and the information that the Agent Communication
@@ -998,12 +1025,13 @@ Principal --------------> Delegating Agent --------------> Delegated Agent
 
 6.3.  Identity Management
 
-   Identity Management establishes who the participants of a dialog are.
-   It builds on the agent identity requirements in Section 7.1 and on
-   the Agent Identity Management System model in [I-D.ietf-wimse-aims].
-   The Agent Communication Protocol does not define identity credentials
-   or authentication protocols.  It defines how participant identities
-   are associated with the agentic dialog and how that association is
+   Identity Management establishes who the principal of a dialog is, and
+   the principals in an upward delegation chain.  It builds on the agent
+   identity requirements in Section 7.1 and on the Agent Identity
+   Management System model in [I-D.ietf-wimse-aims].  The Agent
+   Communication Protocol does not define identity credentials or
+   authentication protocols.  It defines how those identities are
+   associated with the agentic dialog and how that association is
    preserved.
 
 6.3.1.  Identity Roles
@@ -1016,20 +1044,10 @@ Principal --------------> Delegating Agent --------------> Delegated Agent
    *  the agent identity, which is the identity of the agent itself and
       is distinct from that of the principal;
 
-   Keeping these identities distinct is required so that a participant
-   can distinguish the principal, the delegating agent, and the
-   delegated agent, and so that accountability can be assigned to the
-   right entity.
-
-   In multi-party use cases, such as when there is a "conference call"
-   between two users and an AI agent, there will be two distinct agentic
-   dialogs, each with a distinct dialog context.  However, the LLM
-   context is shared, so that the agent is "seeing" the inputs from both
-   principals, and both principals see the output from the agent.  Each
-   principal also needs to see the other's input.  This introduces the
-   need to associate the identity of the principal with each input, and
-   the need for ACP to communicate input from the server, back to the
-   client, that wasn't sent by the principal on that dialog.
+   Keeping these identities distinct is required so that the system can
+   distinguish the principal, the delegating agent, and the delegated
+   agent, and so that accountability can be assigned to the right
+   entity.
 
 7.  Security
 
@@ -1152,7 +1170,7 @@ Principal --------------> Delegating Agent --------------> Delegated Agent
       streams and is not required to guarantee delivery or ordering.
 
    High-throughput reliable delivery:  Used for bulk transfer of large
-      data between dialog participants.  The transport substrate is
+      data between principal and agent.  The transport substrate is
       required to support high-throughput reliable transfer with flow-
       control isolation from other traffic classes [OPEN ISSUE].
 
@@ -1184,18 +1202,6 @@ Principal --------------> Delegating Agent --------------> Delegated Agent
    also required for coordination messages such as authorization
    responses, cancellation acknowledgements, and error notifications,
    because delaying them can break an otherwise correct workflow.
-
-8.4.  Multiple Communication topologies
-
-   Some agent interactions may use one-to-many or many-to-many
-   communication among a group of agents whose membership may change
-   during an exchange.  The transport is required to support these
-   delivery patterns and to handle agents joining or leaving the group
-   while the exchange is active.  An agent's authorization to
-   participate is required to be verified when it joins, and the keying
-   material is required to be updated whenever an agent joins or leaves,
-   so that an agent can decrypt group traffic only while it is a member.
-   MLS [RFC9420] provides group key establishment with these properties.
 
 9.  Applicability of Existing IETF Work
 
@@ -1373,6 +1379,11 @@ Principal --------------> Delegating Agent --------------> Delegated Agent
               Schooler, "SIP: Session Initiation Protocol", RFC 3261,
               DOI 10.17487/RFC3261, July 2002,
               <https://www.rfc-editor.org/rfc/rfc3261>.
+
+   [RFC3550]  Schulzrinne, H., Casner, S., Frederick, R., and V.
+              Jacobson, "RTP: A Transport Protocol for Real-Time
+              Applications", STD 64, RFC 3550, DOI 10.17487/RFC3550,
+              July 2003, <https://www.rfc-editor.org/rfc/rfc3550>.
 
    [RFC8693]  Jones, M., Nadalin, A., Campbell, B., Ed., Bradley, J.,
               and C. Mortimore, "OAuth 2.0 Token Exchange", RFC 8693,
