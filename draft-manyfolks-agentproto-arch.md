@@ -331,11 +331,11 @@ Modern AI Agents can invoke tools that include background activities. As a resul
 
 This complicates the protocol significantly. If the agent needs to generate a response, and that response comes long after the request which triggered it, the server cannot assume the client is still running on the same IP host. Historically, IP protocols have solved for these use cases with webhooks, requiring the client to run its own HTTP server.
 
-### Agents are Named
+### Agents are Identified by a URI
 
-When a principal establishes an agentic dialog with an agent, it is attempting to do so to a particular named instance of the agent. This named instance is, at the very least, associated with the vendor of the agent. "I want to connect to Claude" or "I want to talk to the Walmart AI Agent". However, there can be additional levels of naming too. One can imagine a vendor having different agents with different personas - a contact center AI agent which handles sales vs. support, or a virtual knowledge worker from Salesforce that handles accounting vs. one that handles legal issues. Generally the differing named agents vary by LLM model, but also through the instructions, prompts, guardrails and other aspects of the harness which define its behavior.
+When a principal establishes an agentic dialog with an agent, it is attempting to do so to a particular agent, identified by a URI. The usage of a URI allows an administrative domain to have as many agents as it likes. One can imagine a vendor having different agents with different personas - a contact center AI agent which handles sales vs. support, or a virtual knowledge worker from Salesforce that handles accounting vs. one that handles legal issues. Different agents may be distinct through differing LLM model, instructions, prompts, guardrails and other aspects of the harness which define its behavior. How they differ is up to implementations and not defined by ACP. 
 
-When the principal connects to the agent through its client to initiate an agentic dialog, the client needs to provide to the name to the server, so the server can run the right named instance of the agent.
+When the principal connects to the agent through its client to initiate an agentic dialog, the client provides the URI of the agent it is connecting to. How the principal obtained that URI is outside the scope of the protocol, and could come through provisioning, hyperlinks, or discovery techniques. 
 
 
 ### Client vs Principal and Server vs. Agent
