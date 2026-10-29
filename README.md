@@ -4,10 +4,10 @@
 
 This is the working area for the individual Internet-Draft, "AgentProto Requirements, Use Cases, Concepts and Terminology".
 
-* [Editor's Copy](https://jdrosen.github.io/draft-rosenberg-agentproto-requirements/#go.draft-rosenberg-agentproto-requirements.html)
-* [Datatracker Page](https://datatracker.ietf.org/doc/draft-rosenberg-agentproto-requirements)
-* [Individual Draft](https://datatracker.ietf.org/doc/html/draft-rosenberg-agentproto-requirements)
-* [Compare Editor's Copy to Individual Draft](https://jdrosen.github.io/draft-rosenberg-agentproto-requirements/#go.draft-rosenberg-agentproto-requirements.diff)
+* [Editor's Copy](https://jdrosen.github.io/draft-manyfolks-agentproto-arch/#go.draft-manyfolks-agentproto-arch.html)
+* [Datatracker Page](https://datatracker.ietf.org/doc/draft-manyfolks-agentproto-arch)
+* [Individual Draft](https://datatracker.ietf.org/doc/html/draft-manyfolks-agentproto-arch)
+* [Compare Editor's Copy to Individual Draft](https://jdrosen.github.io/draft-manyfolks-agentproto-arch/#go.draft-manyfolks-agentproto-arch.diff)
 
 
 ## Contributing
