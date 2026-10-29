@@ -234,7 +234,7 @@ ACP targets three distinct interaction patterns:
   (ACP)|         other)
        V
 +-------------+        +--------+
-|  Agent (A)  |------->|  Tool  |
+|  Agent (B)  |------->|  Tool  |
 +------+------+ (ACP,  +--------+
                  other)
 ~~~
