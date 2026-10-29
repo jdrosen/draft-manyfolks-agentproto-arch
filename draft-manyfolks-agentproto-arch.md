@@ -175,7 +175,7 @@ Progress:
 
 
 Dialog Context:
-: Dialog context refers to the state maintained by, and exchanged via, the ACP protocol. Each agentic dialog is associated 1-1 with an instance of dialog context. The dialog context has two primary elements - meta-data and the log. Meta-data is the set of information that is required for the operation of the protocol itself, and includes protocol identifiers (such as the Agentic Dialog Identifier (ADID)), participants along with their identifiers and roles, supported modalities, start time, and so on. The log is the append-only collection of the inputs provided by the principal, the outputs provided by the agent (inclusive of response, information and progress output). The log includes data across all modalities, including real-time voice and video, along with text, images and structured data.
+: Dialog context refers to the state maintained by, and exchanged via, the ACP protocol. Each agentic dialog is associated 1-1 with an instance of dialog context. The dialog context has two primary elements - meta-data and the log. Meta-data is the set of information that is required for the operation of the protocol itself, and includes protocol identifiers (such as the Agentic Dialog Identifier (ADID)), the identity of the principal, the URI for the agent, supported modalities, start time, and so on. The log is the append-only collection of the inputs provided by the principal, the outputs provided by the agent (inclusive of response, information and progress output). The log includes data across all modalities, including real-time voice and video, along with text, images and structured data.
 
 Log:
 : The portion of the dialog context that is the append-only sequence of input from the principal and output (response, information and progress) from the agent.
@@ -213,7 +213,7 @@ Trust Boundary:
 : A boundary between administrative domains.
 
 Message:
-: A discrete unit of communication exchanged between agentic dialog participants.
+: A discrete unit of communication exchanged between the principal and agent
 
 
 
@@ -410,7 +410,7 @@ We can think about the ACP protocol as have three core building blocks.
 | | Management       | | and Delegation   | | Management       | |
 | |                  | |                  | |                  | |
 | | - Identifier     | | - Delegation     | | - Roles          | |
-| | - Lifecycle      | | - Authorization  | | - Participant    | |
+| | - Lifecycle      | | - Authorization  | | - Principal      | |
 | | - Exchange       | | - Decision point | |   identity       | |
 | | - Recovery       | |                  | | - Credential     | |
 | |                  | |                  | |   reference      | |
@@ -511,7 +511,7 @@ Agent execution may be interrupted by user/principal action, policy enforcement,
 
 ## Authorization and Delegation
 
-Authorization and Delegation determines whether a participant is permitted to
+Authorization and Delegation determines whether a principal is permitted to
 act within an agentic dialog and on whose behalf. This sub-block does not define an
 authorization mechanism. It identifies the functions and the information that
 the Agent Communication Protocol needs to associate with a dialog so that
@@ -554,11 +554,11 @@ broadened along the chain.
 
 ## Identity Management
 
-Identity Management establishes who the participants of a dialog are. It
+Identity Management establishes who the principal of a dialog is, and the principals in an upward delegation chain. It
 builds on the agent identity requirements in {{agent-identity}} and on the
 Agent Identity Management System model in {{I-D.ietf-wimse-aims}}. The Agent
 Communication Protocol does not define identity credentials or authentication
-protocols. It defines how participant identities are associated with the
+protocols. It defines how those identities are associated with the
 agentic dialog and how that association is preserved.
 
 ### Identity Roles {#identity-roles}
@@ -571,11 +571,10 @@ The architecture keeps the following identities distinct:
   distinct from that of the principal;
 
 
-Keeping these identities distinct is required so that a participant can
+Keeping these identities distinct is required so that the system can 
 distinguish the principal, the delegating agent, and the delegated agent, and so that accountability can be
 assigned to the right entity.
 
-In multi-party use cases, such as when there is a "conference call" between two users and an AI agent, there will be two distinct agentic dialogs, each with a distinct dialog context. However, the LLM context is shared, so that the agent is "seeing" the inputs from both principals, and both principals see the output from the agent. Each principal also needs to see the other's input. This introduces the need to associate the identity of the principal with each input, and the need for ACP to communicate input from the server, back to the client, that wasn't sent by the principal on that dialog.
 
 # Security  {#security}
 
@@ -629,7 +628,7 @@ Low-latency, loss-tolerant delivery:
 : Used for real-time audio, video, and high-frequency sensor or telemetry streams. The transport substrate is required to minimize latency for these streams and is not required to guarantee delivery or ordering.
 
 High-throughput reliable delivery:
-: Used for bulk transfer of large data between dialog participants. The transport substrate is required to support high-throughput reliable transfer with flow-control isolation from other traffic classes [OPEN ISSUE].
+: Used for bulk transfer of large data between principal and agent. The transport substrate is required to support high-throughput reliable transfer with flow-control isolation from other traffic classes [OPEN ISSUE].
 
 ## Message Exchange Patterns {#message-exchange}
 
@@ -638,12 +637,6 @@ Agentic dialogs are not limited to simple request-response exchange. An agent ma
 ## Priority and Scheduling {#priority}
 
 Delegated agent work varies in urgency and consequence. Some exchanges are on the critical path of a user-visible task, while others are background enrichment, speculative reasoning, or deferred synchronization. The protocol is required to signal task priority and delivery urgency so that transport and scheduling layers can differentiate service. Such signaling is required to be advisory and policy-controlled; a sender is not permitted to raise priority beyond the authority or policy of the delegated task. Priority signaling is also required for coordination messages such as authorization responses, cancellation acknowledgements, and error notifications, because delaying them can break an otherwise correct workflow.
-
-
-
-## Multiple Communication topologies {#topologies}
-
-Some agent interactions may use one-to-many or many-to-many communication among a group of agents whose membership may change during an exchange. The transport is required to support these delivery patterns and to handle agents joining or leaving the group while the exchange is active. An agent's authorization to participate is required to be verified when it joins, and the keying material is required to be updated whenever an agent joins or leaves, so that an agent can decrypt group traffic only while it is a member. MLS {{RFC9420}} provides group key establishment with these properties.
 
 
 # Applicability of Existing IETF Work {#existingworks}
