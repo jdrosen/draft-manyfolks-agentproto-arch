@@ -1,7 +1,7 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-27T04:29:00.540595+00:00",
-  "repo": "jdrosen/draft-rosenberg-agentproto-requirements",
+  "timestamp": "2026-10-29T05:12:17.971848+00:00",
+  "repo": "jdrosen/draft-manyfolks-agentproto-arch",
   "labels": [
     {
       "name": "accessibility",
@@ -54,6 +54,326 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
-  "pulls": []
+  "issues": [
+    {
+      "number": 1,
+      "id": "I_kwDOVH3jXs8AAAABaRuZxA",
+      "title": "Terminology: two kinds of context need separate terms",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/issues/1",
+      "state": "CLOSED",
+      "author": "tireddy2",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "## Problem\n\n\"Dialog Context\" is used for the context the agent builds, which ACP\ndoes not transmit. But ACP also carries information about the dialog\nbeyond its identifier, such as its lifecycle state, version, creator,\nnegotiated modalities, and lifetime. That information has no name.\n\n## Proposal\n\n```\nDialog Context:\n: The information that ACP carries to correlate and maintain an\n  agentic dialog, such as the Agentic Dialog Identifier, the lifecycle\n  state, the participant that created the dialog, the negotiated\n  modalities, and the lifetime.\n\nTask Context:\n: The context an agent builds and maintains over an agentic dialog,\n  such as conversation history, instructions, and intermediate\n  results. ACP does not transmit or interpret it.\n```\n\nSection 4.2.9 would then read \"ACP doesn't Transmit Task Context\".",
+      "createdAt": "2026-10-27T11:35:04Z",
+      "updatedAt": "2026-10-28T19:49:17Z",
+      "closedAt": "2026-10-28T19:49:17Z",
+      "comments": [
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "I cleanly separated this now, but used \"dialog context\" and \"LLM context\". ",
+          "createdAt": "2026-10-28T19:49:04Z",
+          "updatedAt": "2026-10-28T19:49:04Z"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "id": "I_kwDOVH3jXs8AAAABaR2bkA",
+      "title": "Two-party model in Section 5 conflicts with other sections",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/issues/2",
+      "state": "CLOSED",
+      "author": "tireddy2",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "## Problem\n\nThe draft describes the dialog topology in four inconsistent ways:\n\n- Section 5: \"fundamentally two-party\"; topologies are built from\n  \"two unrelated instances of ACP ... connected only through delegated\n  identities\".\n- Section 6.1.1: the ADID correlates messages \"at every hop\", is used\n  by intermediaries, and \"a dialog can involve more than two\n  participants\".\n- Section 8.4: group communication with membership that changes during\n  an exchange.\n- Section 11: identifiers \"persist across intermediaries and trust\n  boundaries\", which Section 5's model rules out.\n\n## Proposal\n\nSupport both models, and state it once in Section 5:\n\n```\nA participant can carry a dialog to the next hop, or create a new\ndialog, with a new dialog context, linked to the one it received. A\nnew dialog is created at a trust boundary and wherever local policy\nrequires it. Only the participant that creates the new dialog knows\nthe link. A dialog can have more than two participants, such as\nmembers of a group.\n```\n\nThen align Section 11: a dialog context identifier does not cross a\ntrust boundary.",
+      "createdAt": "2026-10-27T11:44:11Z",
+      "updatedAt": "2026-10-28T20:00:51Z",
+      "closedAt": "2026-10-28T20:00:51Z",
+      "comments": [
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "I've cleaned this up so it is clear that its 2-party, but that the ADID and principal identities are propagated into downstream agentic dialogs. I added a diagram as well to clarify this. ",
+          "createdAt": "2026-10-28T20:00:51Z",
+          "updatedAt": "2026-10-28T20:00:51Z"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "id": "I_kwDOVH3jXs8AAAABaR-N9A",
+      "title": "Intermediaries are defined but their roles are not described",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/issues/3",
+      "state": "CLOSED",
+      "author": "tireddy2",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-10-27T11:52:55Z",
+      "updatedAt": "2026-10-28T20:04:52Z",
+      "closedAt": "2026-10-28T20:04:52Z",
+      "comments": [
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "I removed the \"intermediary\" concept from the doc, and instead talk about delegating agents. ",
+          "createdAt": "2026-10-28T20:04:52Z",
+          "updatedAt": "2026-10-28T20:04:52Z"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "id": "I_kwDOVH3jXs8AAAABaSBebA",
+      "title": "Authorized agent",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/issues/4",
+      "state": "CLOSED",
+      "author": "tireddy2",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Section 6.1.2: who is \"an authorized agent\" here? It is not defined.",
+      "createdAt": "2026-10-27T11:56:30Z",
+      "updatedAt": "2026-10-28T20:05:49Z",
+      "closedAt": "2026-10-28T20:05:49Z",
+      "comments": [
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "Removed the word \"authorized\". It is not needed for this sentence to be understood anyway.",
+          "createdAt": "2026-10-28T20:05:49Z",
+          "updatedAt": "2026-10-28T20:05:49Z"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "id": "I_kwDOVH3jXs8AAAABaSCecA",
+      "title": "Resumption: verify the resuming party and handle interrupted operations",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/issues/5",
+      "state": "CLOSED",
+      "author": "tireddy2",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Section 6.1.2 says an authorized agent uses the ADID to re-associate\nwith the dialog. Holding the ADID is not enough. On resumption, the\nreceiver should verify that the resuming party is the one whose\nexchange was interrupted, that its dialog context is current, and that\nthe dialog is still authorized.\n\nAlso, resuming the dialog does not show whether an interrupted\noperation completed. Its outcome stays unresolved until it can be\nestablished, and resuming alone does not justify sending it again.",
+      "createdAt": "2026-10-27T11:57:39Z",
+      "updatedAt": "2026-10-28T20:09:10Z",
+      "closedAt": "2026-10-28T20:09:10Z",
+      "comments": [
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "Added: Of course, proper authentication is also required - knowledge of the ADID is insufficient for the newly formed connection to be associated to the agentic dialog. \n\nAlso added: Resumption also requires protocol agreement on whether the client needs to reply prior input, or whether the server had already processed it. ",
+          "createdAt": "2026-10-28T20:09:10Z",
+          "updatedAt": "2026-10-28T20:09:10Z"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "id": "I_kwDOVH3jXs8AAAABaVYAIw",
+      "title": "Should dialog identifiers be resistant to forgery?",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/issues/6",
+      "state": "CLOSED",
+      "author": "maxpassion",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "During the BoF discussion, the concern was raised that identifiers are too easy to forge.\n\nIs there a need for identifiers to be verifiable, so that the party receiving an identifier can tell whether it belongs to the dialog it claims to represent?",
+      "createdAt": "2026-10-27T15:21:55Z",
+      "updatedAt": "2026-10-28T20:11:53Z",
+      "closedAt": "2026-10-28T20:11:53Z",
+      "comments": [
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "I don't think this is complex. a dialog identifier should be a UUID, unique in space and time, and unguessable. Knowledge of an ADID provides no information whatsoever about the agentic dialog. KNowledge of he ADID is also insufficient for a client to connect to the server, and access the agentic dialog in any way - the client must also authenticate itself, and be authorized for such access. \n\nI've added this to the doc.",
+          "createdAt": "2026-10-28T20:11:51Z",
+          "updatedAt": "2026-10-28T20:11:51Z"
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "id": "I_kwDOVH3jXs8AAAABagM0Bw",
+      "title": "Distinguish a failed check from one that could not be completed",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/issues/8",
+      "state": "CLOSED",
+      "author": "tireddy2",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Section 6.1.2 lists lifecycle events but not the states they move between, so it cannot say, for example, that a terminated dialog\ncannot be resumed. Lifecycle states and transitions are being discussed for draft-zahed-agentproto-refarch:\nhttps://github.com/zaheduzzaman/overall-aiproto-architecture/pull/8\n\nCancellation of prior input is a task-level action, already covered in Section 6.1.6, and rehydration is a client synchronizing its local\nstorage. Neither changes the state of the dialog, so they do not belong in the lifecycle list.",
+      "createdAt": "2026-10-28T06:03:50Z",
+      "updatedAt": "2026-10-28T20:14:13Z",
+      "closedAt": "2026-10-28T20:14:13Z",
+      "comments": [
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "I think the actual state machine is outside the scope of this doc and would belong in the actual protocol spec. I did clarify that terminated means it cannot be resumed.",
+          "createdAt": "2026-10-28T20:14:01Z",
+          "updatedAt": "2026-10-28T20:14:01Z"
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "id": "I_kwDOVH3jXs8AAAABagNbCg",
+      "title": "Add an operational flow",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/issues/9",
+      "state": "OPEN",
+      "author": "tireddy2",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The draft describes each function separately but does not show how\nthey combine in one interaction, from selecting an agent to completing\nthe task. An operational flow covering connection, authentication,\nauthorization, dialog creation, delegation, continuity, and completion\nis being added to draft-zahed-agentproto-refarch:\nhttps://github.com/zaheduzzaman/overall-aiproto-architecture/pull/7\n\nSuggest including it here.",
+      "createdAt": "2026-10-28T06:04:46Z",
+      "updatedAt": "2026-10-28T20:18:18Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "I think this is too low level and belongs in the protocol doc. ",
+          "createdAt": "2026-10-28T20:18:17Z",
+          "updatedAt": "2026-10-28T20:18:17Z"
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "id": "I_kwDOVH3jXs8AAAABagOkGg",
+      "title": "Resuming does not establish the outcome of an interrupted operation",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/issues/10",
+      "state": "CLOSED",
+      "author": "tireddy2",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Section 6.1.4 describes a server failing while processing a request,\nbut not what the client does after resuming the dialog.\n\nFor example, the client asks an agent to book a room, and the\nconnection drops before the reply arrives. After resuming, the client\ncannot tell whether the room was booked. Sending the request again\ncould book a second room. The client should first find out whether\nthe request completed.\n\nSee Section 4.2 of draft-agentic-ai-usecases-requirements:\nhttps://datatracker.ietf.org/doc/draft-agentic-ai-usecases-requirements/",
+      "createdAt": "2026-10-28T06:06:28Z",
+      "updatedAt": "2026-10-28T20:23:47Z",
+      "closedAt": "2026-10-28T20:23:47Z",
+      "comments": [
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "I added:\n\n* Resumption: Resuming input or output, requiring (if needed) creation or modification of transport connections to convey the input or output. Resumption also requires protocol agreement on whether the client needs to replay prior input, or whether the server had already processed it. \n",
+          "createdAt": "2026-10-28T20:23:43Z",
+          "updatedAt": "2026-10-28T20:23:43Z"
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "id": "I_kwDOVH3jXs8AAAABagT4lQ",
+      "title": "Bring back the end-to-end architecture diagram",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/issues/11",
+      "state": "CLOSED",
+      "author": "tireddy2",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The end-to-end architecture diagram from draft-zahed-agentproto-refarch was dropped. It showed users, agents, and tools over the agent\ncommunication protocol, with its dialog, authorization and delegation, and identity management blocks, running over the transport and\nsecurity layers. The current figures show the network topology and the functional blocks separately, but not how ACP relates to transport and\nsecurity. Suggest bringing it back.",
+      "createdAt": "2026-10-28T06:14:25Z",
+      "updatedAt": "2026-10-28T20:30:05Z",
+      "closedAt": "2026-10-28T20:30:05Z",
+      "comments": [
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "I brought back a simplified version of it into the section on interaction patterns. ",
+          "createdAt": "2026-10-28T20:30:05Z",
+          "updatedAt": "2026-10-28T20:30:05Z"
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "id": "I_kwDOVH3jXs8AAAABaitrCg",
+      "title": "Multi-level identification",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/issues/12",
+      "state": "CLOSED",
+      "author": "khyao78",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "In the discussion yesterday, we tentatively agreed that a dialog refers to the conversation between two parties, while the dialog context is protocol-level metadata used to correlate multiple dialogs.\n\nThen, regarding identification, do we need multi-level identifiers? Identifying both the dialog (dialog identifier) and the dialog context (dialog context identifier)?\n\nThe two identifiers serve different functions.\n\nThe dialog ID represents the independence of each dialog.\n\nThe dialog context ID is used for logical association/binding across multiple dialogs and can serve as the identifier for the complete envelope.",
+      "createdAt": "2026-10-28T09:28:23Z",
+      "updatedAt": "2026-10-28T20:30:59Z",
+      "closedAt": "2026-10-28T20:30:59Z",
+      "comments": [
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "We don't need two. I hope this is now clear in the document, there is a diagram on how delegation works. ",
+          "createdAt": "2026-10-28T20:30:48Z",
+          "updatedAt": "2026-10-28T20:30:48Z"
+        }
+      ]
+    }
+  ],
+  "pulls": [
+    {
+      "number": 7,
+      "id": "PR_kwDOVH3jXs8AAAABLK4PCA",
+      "title": "update affiliation",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/pull/7",
+      "state": "MERGED",
+      "author": "maxpassion",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "update affiliation to alibaba",
+      "createdAt": "2026-10-28T03:11:03Z",
+      "updatedAt": "2026-10-28T13:56:10Z",
+      "baseRepository": "jdrosen/draft-manyfolks-agentproto-arch",
+      "baseRefName": "main",
+      "baseRefOid": "1b5eab69898950669a1be9485b8097dc8989f6d7",
+      "headRepository": "maxpassion/draft-manyfolks-agentproto-arch",
+      "headRefName": "patch-1",
+      "headRefOid": "c41d0ee4043c0dc1fc9524148848725f9295ac36",
+      "closedAt": "2026-10-28T13:56:09Z",
+      "mergedAt": "2026-10-28T13:56:09Z",
+      "mergedBy": "jdrosen",
+      "mergeCommit": {
+        "oid": "f77d4600af73c1627992586a44fe0d1cd4eb1089"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 13,
+      "id": "PR_kwDOVH3jXs8AAAABLa4aCA",
+      "title": "Should it be Agent (B) instead of Agent (A) in this figure?",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/pull/13",
+      "state": "OPEN",
+      "author": "maxpassion",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Should it be Agent (B) instead of Agent (A) in this figure?",
+      "createdAt": "2026-10-29T03:01:44Z",
+      "updatedAt": "2026-10-29T03:01:44Z",
+      "baseRepository": "jdrosen/draft-manyfolks-agentproto-arch",
+      "baseRefName": "main",
+      "baseRefOid": "4c3a08c161718f9165dde87cf14c09083337470c",
+      "headRepository": "maxpassion/draft-manyfolks-agentproto-arch",
+      "headRefName": "patch-2",
+      "headRefOid": "02619419a3c1f6791f24356829448e75e7873d78",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    }
+  ]
 }
