@@ -99,7 +99,7 @@ informative:
 
 --- abstract
 
-This document defines the terminology and architecture for AI agent communications protocols over the Internet. It provides the foundational architectural elements for the Agent Communications Protocol (ACP) - also known as agentproto - a new protocol to be developed in the IETF. ACP enables communication between user agent clients and AI agents, between AI Agents and other AI Agents, or between AI Agents and tools. All three of these interaction patterns - and the many use cases therein - require a session-type protocol which handles lifecycle management, including creation, modification, deletion and so on - along with the exchange of input and output. These sessions can be extremely long lived - running for hours or even days - and span multiple IP hosts used by the both the principal and by the agent. They can also be highly intermittent with asynchronous responses. All of these mean a new type of session protocol is needed.
+This document defines the terminology and architecture for AI agent communications protocols over the Internet. It provides the foundational architectural elements for the Agent Communications Protocol (ACP) - also known as agentproto - a new protocol to be developed in the IETF. ACP enables communication between user agent clients and AI agents, between AI Agents and other AI Agents, or between AI Agents and tools. All three of these interaction patterns - and the many use cases therein - require a session-like protocol which handles lifecycle management, including creation, modification, deletion and so on - along with the exchange of input and output. These session-like associations can be extremely long lived - running for hours or even days - and span multiple IP hosts used by the both the principal and by the agent. They can also be highly intermittent with asynchronous responses. All of these mean a new type of protocol is needed.
 
 
 
@@ -107,14 +107,13 @@ This document defines the terminology and architecture for AI agent communicatio
 
 # Introduction {#intro}
 
-The widespread usage of AI Agents on the Internet has introduced new forms of networked communications. User agent clients connect to AI agents running elswehere, AI agents communicate with other AI agents, and AI agents communicate with tools. All three of these interaction patterns - and the many use cases therein - require a session-type protocol which handles lifecycle management, including creation, modification, deletion and so on - along with the exchange of input and output. These sessions can be extremely long lived - running for hours or even days - and span multiple IP hosts used by the both the principal and by the agent. They can also be highly intermittent with asynchronous responses. All of these mean a new type of session protocol is needed.
+The widespread usage of AI Agents on the Internet has introduced new forms of networked communications. User agent clients connect to AI agents running elswehere, AI agents communicate with other AI agents, and AI agents communicate with tools. All three of these interaction patterns - and the many use cases therein - require a session-like protocol which handles lifecycle management, including creation, modification, deletion and so on - along with the exchange of input and output. These session-like associations can be extremely long lived - running for hours or even days - and span multiple IP hosts used by the both the principal and by the agent. They can also be highly intermittent with asynchronous responses. All of these mean a new type of protocol is needed.
 
-
-These sessions differ from the type of sessions created by the Session Initiation Protocol (SIP) [RFC3261], which are shorter lived and work between a single IP host for each participant.
+These differ from the type of sessions created by the Session Initiation Protocol (SIP) [RFC3261], which are shorter lived and work between a single IP host for each participant.
 
 This document introduces concepts, terminology, reference architecture and protocol functional blocks for ACP, which manages agentic dialogs. An agentic dialog is defined as a session between two parties - a principal whose role is to provide input to, and receive output from, an agent - and the agent, which is running a process which has properties which are agentic in nature. The agentic properties that are relevant here are (1) conversational contuity, and (2) driven by natural language in each direction. These concepts are discussed in more detail in this document.
 
-This document breaks ACP down into three functional blocks - agentic dialog management, authorization and delegation, and identity management. As a session-layer protocol, ACP rides ontop of transport protocols. This document identifies requirements of these transport protocols to aid in their selection.
+This document breaks ACP down into three functional blocks - agentic dialog management, authorization and delegation, and identity management. As a session-like protocol, ACP rides ontop of transport protocols. This document identifies requirements of these transport protocols to aid in their selection.
 
 The use cases and requirements that drive this architecture are described in
 {{I-D.agentic-ai-usecases-requirements}} and {{I-D.rosenberg-aiproto-framework}}. The wire formats and protocol elements of the agent communication protocol are outside the scope of this document. This document describes the the functional
@@ -156,7 +155,7 @@ LLM Context:
 : Same as context. We used the adjective "LLM" in front of context to help differentiate LLM context from dialog context.
 
 Agentic Dialog:
-: A session between two parties - a principal whose role is to provide input to, and receive output from, an agent - and the agent, which is running a process which has properties which are agentic in nature and result in the maintenance of LLM context. The agentic properties that are relevant here are (1) conversational contuity, and (2) driven by natural language in each direction. An agentic dialog is associated 1-1 with the LLM context it builds. ACP doesn't define how the agent maintains the LLM context; it merely allows for the establishment of an agentic dialog and exchange of data which allows the agent to do so.
+: An association between two parties - a principal whose role is to provide input to, and receive output from, an agent - and the agent, which is running a process which has properties which are agentic in nature and result in the maintenance of LLM context. The agentic properties that are relevant here are (1) conversational contuity, and (2) driven by natural language in each direction. An agentic dialog is associated with the LLM context it builds. ACP doesn't define how the agent maintains the LLM context; it merely allows for the establishment of an agentic dialog and exchange of data which allows the agent to do so.
 
 Input:
 : Information provided by the principal, which is used to drive the operation of the agent. In simplest terms, this is the stuff that the principal types or speaks to the AI agent, e.g., "I want to book a trip to Maui" or "That sounds like a good idea but what is the weather like that time of year?".
@@ -265,9 +264,9 @@ This is the core interaction pattern for A2A {A2A}.
 
 # Core Concept: Agentic Dialog
 
-When we look at all of the interaction patterns, there is a common theme which runs through all of them - the notion of a long-lived session between two entities, with a growing context window as the interaction progresses, with a defined start and eventual finish. That's a mouthful, so we propose a specific name for this - an agentic dialog.
+When we look at all of the interaction patterns, there is a common theme which runs through all of them - the notion of a long-lived association between two entities, with a growing context window as the interaction progresses, with a defined start and eventual finish. That's a mouthful, so we propose a specific name for this - an agentic dialog.
 
-An agentic dialog is defined as a session between two parties - a principal whose role is to provide input to, and receive output from, an agent - and the agent, which is running a process which has properties which are agentic in nature. The agentic properties that are relevant here are (1) conversational contuity, and (2) driven by natural language in each direction.
+An agentic dialog is defined as an association between two parties - a principal whose role is to provide input to, and receive output from, an agent - and the agent, which is running a process which has properties which are agentic in nature. The agentic properties that are relevant here are (1) conversational contuity, and (2) driven by natural language in each direction.
 
 The principal can be a human user (as in the user agent to AI agent case noted above), but the principal can also be an AI agent - as in the A2A case. The agent is typically an AI Agent, but it could be another human,  with that human being receiving the input and providing output. In this way, the term "agent" defined here refers strictly to the role in the protocol, which can be fulfilled by a human agent, an AI agent, or even traditional software. Indeed, in the A2T case, the agent might be a piece of software which supports only a small amount of conversational capability.
 
@@ -276,7 +275,7 @@ The agentic dialog is facilitated by a protocol, which runs between a client (ac
 
 ## Definitional Properties
 
-An agentic dialog is distinct from other types of sessions (like the SIP dialog) because of two key properties.
+An agentic dialog is distinct from typical protocol sessions - like a SIP dialog -  because of two key properties.
 
 ### Conversational Continuity
 
