@@ -149,7 +149,7 @@ Task:
 
 
 Context:
-: Context is central to the concept of AI Agents. There are many definitions on the Internet. Anthropic defines it as "the set of tokens included when sampling from a large-language model (LLM)." {{anthropic-context-def}}. The goal of ACP is to exchange the input from the principal to allow the agent to manage context, and the output from inference of that context. The context itself is invisible to ACP. 
+: Context is central to the concept of AI Agents. There are many definitions on the Internet. Anthropic defines it as "the set of tokens included when sampling from a large-language model (LLM)." {{anthropic-context-def}}. The goal of ACP is to exchange the input from the principal to allow the agent to manage context, and the output from inference of that context. The context itself is invisible to ACP.
 
 LLM Context:
 : Same as context. We used the adjective "LLM" in front of context to help differentiate LLM context from dialog context.
@@ -283,7 +283,7 @@ Conversational continuity means that, as far as the principal is concerned, the 
 
 The LLM context is used by the agent to determine how to satisfy the needs of the principal as specified via input. Those needs may evolve over time.
 
-As such, each agentic dialog is associated with the LLM context which it feeds, and is fed by. The protocol has no constraints on how an agent associates the agentic dialog with LLM context. Indeed, an agent could decide to reuse LLM context across agentic dialogs, at its discretion. 
+As such, each agentic dialog is associated with the LLM context which it feeds, and is fed by. The protocol has no constraints on how an agent associates the agentic dialog with LLM context. Indeed, an agent could decide to reuse LLM context across agentic dialogs, at its discretion.
 
 
 ### Driven by Natural Language
@@ -332,9 +332,9 @@ This complicates the protocol significantly. If the agent needs to generate a re
 
 ### Agents are Identified by a URI
 
-When a principal establishes an agentic dialog with an agent, it is attempting to do so to a particular agent, identified by a URI. The usage of a URI allows an administrative domain to have as many agents as it likes. One can imagine a vendor having different agents with different personas - a contact center AI agent which handles sales vs. support, or a virtual knowledge worker from Salesforce that handles accounting vs. one that handles legal issues. Different agents may be distinct through differing LLM model, instructions, prompts, guardrails and other aspects of the harness which define its behavior. How they differ is up to implementations and not defined by ACP. 
+When a principal establishes an agentic dialog with an agent, it is attempting to do so to a particular agent, identified by a URI. The usage of a URI allows an administrative domain to have as many agents as it likes. One can imagine a vendor having different agents with different personas - a contact center AI agent which handles sales vs. support, or a virtual knowledge worker from Salesforce that handles accounting vs. one that handles legal issues. Different agents may be distinct through differing LLM model, instructions, prompts, guardrails and other aspects of the harness which define its behavior. How they differ is up to implementations and not defined by ACP.
 
-When the principal connects to the agent through its client to initiate an agentic dialog, the client provides the URI of the agent it is connecting to. How the principal obtained that URI is outside the scope of the protocol, and could come through provisioning, hyperlinks, or discovery techniques. 
+When the principal connects to the agent through its client to initiate an agentic dialog, the client provides the URI of the agent it is connecting to. How the principal obtained that URI is outside the scope of the protocol, and could come through provisioning, hyperlinks, or discovery techniques.
 
 
 ### Client vs Principal and Server vs. Agent
@@ -354,13 +354,13 @@ Firstly, the LLM context is usually initialized with system instructions, which 
 
 What ACP does exchange, is input and output. Input is information the principal wishes to send to the agent, and output is information the agent wishes to send to the principal. The input and output are appended to form the log, the main part of the dialog context.
 
-ACP doesn't define how the agent evolves the LLM context based on the input, nor does it define how the output from the agent is funnelled into ACP. This means that ACP is seeing just the "on-the-wire" exchange, and that exchange is stored in the log that is part of the dialog context. The dialog context is associated 1-1 with the agentic dialog. However, the mapping of an agentic dialog to the LLM context is a matter of local implementation. 
+ACP doesn't define how the agent evolves the LLM context based on the input, nor does it define how the output from the agent is funnelled into ACP. This means that ACP is seeing just the "on-the-wire" exchange, and that exchange is stored in the log that is part of the dialog context. The dialog context is associated 1-1 with the agentic dialog. However, the mapping of an agentic dialog to the LLM context is a matter of local implementation.
 
 The distinction between LLM context and dialog context also aligns with the distinction between server and agent. The LLM context is a core property of the agent, NOT of the server, whereas the dialog context is a property of the server, and not its associated agent. In ACP,  we are conveying information to and from the agent on the server, but the LLM context lives with the agent. The protocol will concern itself with technical conveyance issues necessary to make sure both client and server have an aligned view of the dialog context. But, how that dialog context is related to the LLM context is a matter of local implementation.
 
 ### Log Content is Opaque to ACP
 
-The actual text, image, or video that form the input and output that build up the log are not actually processed by ACP. To ACP, they are opaque. ACP only cares about the meta-data of each log entry - identifiers, timestamps, and so on - in order to support exchange, synchronization, recovery and rehydration. A good analogy is the RTP protocol [RFC3550], which doesn't care about the payloads it conveys - it just conveys them. The actual content matter to the agent - and more specifically - the LLM - which runs inference on it to comprehend and respond. ACP just wants to move the data around. 
+The actual text, image, or video that form the input and output that build up the log are not actually processed by ACP. To ACP, they are opaque. ACP only cares about the meta-data of each log entry - identifiers, timestamps, and so on - in order to support exchange, synchronization, recovery and rehydration. A good analogy is the RTP protocol [RFC3550], which doesn't care about the payloads it conveys - it just conveys them. The actual content matter to the agent - and more specifically - the LLM - which runs inference on it to comprehend and respond. ACP just wants to move the data around.
 
 
 ### Output Isnt Just the Response
@@ -570,7 +570,7 @@ The architecture keeps the following identities distinct:
   distinct from that of the principal;
 
 
-Keeping these identities distinct is required so that the system can 
+Keeping these identities distinct is required so that the system can
 distinguish the principal, the delegating agent, and the delegated agent, and so that accountability can be
 assigned to the right entity.
 
