@@ -1,0 +1,2350 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>Architecture for AI Agent Communications on the Internet</title>
+<meta content="Jonathan Rosenberg" name="author">
+<meta content="Zaheduzzaman Sarker" name="author">
+<meta content="Tirumaleswar Reddy" name="author">
+<meta content="Kehan Yao" name="author">
+<meta content="Dapeng Liu" name="author">
+<meta content="Suresh Krishnan" name="author">
+<meta content="
+       This document defines the terminology and architecture for AI agent communications protocols over the Internet. It provides the foundational architectural elements for the Agent Communications Protocol (ACP) - also known as agentproto - a new protocol to be developed in the IETF. ACP enables communication between user agent clients and AI agents, between AI Agents and other AI Agents, or between AI Agents and tools. All three of these interaction patterns - and the many use cases therein - require a session-like protocol which handles lifecycle management, including creation, modification, deletion and so on - along with the exchange of input and output. These session-like associations can be extremely long lived - running for hours or even days - and span multiple IP hosts used by both the principal and by the agent. They can also be highly intermittent with asynchronous responses. All of these mean a new type of protocol is needed. 
+    " name="description">
+<meta content="xml2rfc 3.34.1" name="generator">
+<meta content="AI" name="keyword">
+<meta content="Agent Protocols" name="keyword">
+<meta content="Agentic" name="keyword">
+<meta content="draft-manyfolks-agentproto-arch-latest" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.34.1
+    Python 3.14.8
+    ConfigArgParse 1.8.0
+    google-i18n-address 3.1.1
+    intervaltree 3.2.1
+    Jinja2 3.1.6
+    lxml 6.1.1
+    natsort 8.4.0
+    platformdirs 4.13.4
+    pycountry 24.6.1
+    PyYAML 6.0.3
+    requests 2.33.1
+    wcwidth 0.9.2
+-->
+<link href="draft-manyfolks-agentproto-arch.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
+  --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  --font-title: "Sofia Sans Semi Condensed", sans-serif;
+  scrollbar-color: #bbb #eee;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+section {
+  clear: both;
+}
+.section-number {
+  padding-right: 0.5em;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+  font-weight: 680;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+h1 {
+  &#title {
+    font-size: 32px;
+    line-height: 40px;
+    clear: both;
+    margin: 1.5em 0 0.2em;
+  }
+  &#rfcnum {
+    margin: 1.5em 0 0.2em;
+    & + h1#title {
+      margin: 0.2em 0;
+    }
+  }
+}
+
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+#abstract+p {
+  font-size: 18px;
+  line-height: 24px;
+  & code, & samp, & tt {
+    font-size: 16px;
+    line-height: 0;
+  }
+}
+
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight {
+  margin: 1em 0;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    margin: 0;
+    float: right;
+    clear: both;
+  }
+  & > *:nth-child(2) {
+    clear: both;
+    display: block;
+    border: none;
+  }
+}
+svg {
+  display: block;
+  /* font-family isn't space-separated, but =~ will have to do */
+  &[font-family~="monospace" i], & [font-family~="monospace" i] {
+    font-family: var(--font-mono);
+  }
+}
+.alignCenter {
+  margin: 1em 0;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+       support flexbox yet.
+    */
+    display: table;
+    margin: 0 auto;
+  }
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+  & :is(ol, ul) {
+    margin-left: 1em;
+  }
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+  & li {
+    margin-top: 0.5em;
+  }
+}
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  margin: 0 0 0 2em;
+  & li {
+    margin: 0;
+    & :first-child { margin-top: 0; }
+    & :last-child { margin-bottom: 0; }
+  }
+}
+
+/* definition lists */
+dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+  &.olPercent {
+    --indent: 5ch;
+    & > dt {
+      min-width: calc(var(--indent) - 2ch);
+      float: none;
+    }
+  }
+
+  dl > dd > & {
+    margin-top: 0.5em;
+    margin-bottom: 0;
+  }
+
+  &:not(.dlNewline) > dt {
+    float: left;
+    margin-right: 2ch;
+    min-width: 8ch;
+  }
+  & > dd {
+    margin-bottom: .8em;
+    margin-left: var(--indent) !important; /* stupid element overrides */
+    min-height: 2ex;
+  }
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0;
+  & > :is(:first-child, .break:first-child + *) {
+    margin-top: 0;
+  }
+  & > :is(:last-child) {
+    margin-bottom: 0;
+  }
+}
+:is(dd, span).break {
+  display: none;
+}
+
+/* links */
+a {
+  text-decoration: none;
+  &[href] {
+    color: var(--link-color);
+    &:hover { text-decoration: underline; }
+    &.selfRef {
+      color: var(--text-color);
+      &:hover {
+        text-decoration: none;
+        background-color: var(--highlight-color);
+      }
+    }
+  }
+}
+.iref + a[href].internal {
+  color: var(--text-color);
+}
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
+  line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+  & blockquote {
+    margin: 0.8em 0.4em 0.4em;
+  }
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+  caption-side: bottom;
+}
+@media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) {
+    & p {
+      margin: -2px 0;
+      max-height: 0;
+      transition: max-height 2s ease, margin 0.5s ease 0.5s;
+      overflow: hidden;
+    }
+    &:hover p,
+    & h2:target ~ p {
+      margin: 0.5em 0;
+      max-height: 500px;
+      overflow: auto;
+    }
+  }
+  pre, svg {
+    display: inline-block;
+    /* In the horizontal direction, sometimes people make over-sized figures.
+       Scrollbars for those is therefore necessary: auto adds them as necessary..
+       In the vertical direction, the line-height can combine with the font
+       asender/descender height to produce scrollbars: hidden avoids that. */
+    overflow: auto hidden;
+  }
+  pre {
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  :is(pre, svg) + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  margin: 1em 0;
+  border-left: 2px var(--pilcrow-strong) solid;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  width: auto;
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+  &.right { margin-left: auto; }
+  &.center { margin-left: auto; margin-right: auto; }
+  &.left { margin-right: auto; }
+  & .text-left { text-align: left; }
+  & .text-center { text-align: center; }
+  & .text-right { text-align: right; }
+  & caption {
+    margin: 0;
+    padding: 3px 0 3px 1em;
+  }
+  & p { margin: 0; }
+}
+
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
+  background-color: var(--background-color);
+}
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
+  background-color: var(--highlight-color);
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  opacity: 0.2;
+  user-select: none;
+  &[href] {
+    color: var(--pilcrow-weak);
+    &:hover { text-decoration: none; }
+  }
+  @media not print {
+    :hover > &, &:focus {
+      opacity: 1;
+    }
+    &[href]:hover {
+      color: var(--pilcrow-strong);
+      background-color: transparent;
+    }
+  }
+  @media print {
+    display: none;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: var(--small-font-size);
+}
+.role {
+  font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 15ch;
+  & dt {
+    width: var(--identifier-width);
+    min-width: var(--identifier-width);
+    clear: left;
+    float: left;
+    text-align: right;
+    margin-right: 1ch;
+  }
+  & dd {
+    margin: 0;
+    margin-left: calc(1em + var(--identifier-width)) !important;
+    min-width: 5em;
+  }
+  & .authors {
+    & .author {
+      display: inline-block;
+      margin-right: 1.5em;
+    }
+    & .org {
+      font-style: italic;
+    }
+  }
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+  & .prepared {
+    float: right;
+  }
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+
+  & nav {
+    & ul {
+      margin: 0 0.5em 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    & li {
+      line-height: 1.3em;
+      margin: 2px 0;
+      padding-left: 1.2em;
+      text-indent: -1.2em;
+    }
+  }
+  & a.xref {
+    white-space: normal;
+  }
+}
+
+.references {
+  & > dt {
+    text-align: right;
+    font-weight: bold;
+    min-width: 10ch;
+    margin-right: 1.5ch;
+    &:target::before {
+      content: "⇒";
+      margin: 0 10px 0 -25px;
+    }
+  }
+  & > dd {
+    margin-left: 12ch !important;
+    overflow: visible;
+    & .refInstance {
+      margin-bottom: 0.8em;
+    }
+    & .ascii {
+      margin-bottom: 0.25em;
+    }
+  }
+}
+
+#rfc\.index\.index + ul {
+  margin-left: 0;
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  max-width: 20em;
+  margin: 1em auto 1em 0;
+
+  & .nameRole {
+    font-weight: 700;
+    margin-left: 0;
+  }
+  & .label {
+    margin: 0.5em 0;
+  }
+  & .type {
+    display: none;
+  }
+  & .alternative-contact {
+    margin: 0.5em 0 0.25em 0;
+  }
+  & .non-ascii {
+    margin: 0 0 0 2em;
+  }
+  & div.left {
+    text-align: left;
+  }
+  & div.right {
+    text-align: right;
+  }
+}
+
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses {
+    & > section {
+      column-count: 2;
+      column-gap: 20px;
+    }
+    & > section > h2 {
+      column-span: all;
+    }
+    /* hack for break-inside: avoid-column */
+    & address {
+      display: inline-block;
+      break-inside: avoid-column;
+    }
+  }
+}
+
+/* Comments */
+.rfcEditorRemove {
+  & p:first-of-type {
+    font-style: italic;
+  }
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+
+@media screen {
+  #toc {
+    & nav {
+      font-family: var(--font-title);
+      font-weight: 360;
+      & > ul { margin-bottom: 2em; }
+      & ul {
+        margin: 0 0 0 4px;
+        & :is(p, li) {
+          margin: 2px 0;
+        }
+      }
+    }
+    & a.toplink {
+      float: right;
+    }
+  }
+}
+@media not screen {
+  #toc a.toplink {
+    display: none;
+  }
+}
+
+
+/* TOC layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 1px 0 0 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+    & h2 {
+      margin: 0;
+      padding: 2px 0 2px 6px;
+      padding-right: 1em;
+      font-size: 18px;
+      line-height: 24px;
+      min-width: 190px;
+      text-align: right;
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+      &::before { /* css hamburger */
+        float: right;
+        position: relative;
+        width: 1em;
+        height: 1px;
+        left: -164px;
+        margin: 8px 0 0 0;
+        background: white none repeat scroll 0 0;
+        box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+        content: "";
+      }
+    }
+    & nav {
+      display: none;
+      background-color: var(--background-color);
+      padding: 0.5em 1em 1em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      height: calc(100vh - 48px);
+      border-left: 1px solid #ddd;
+    }
+    &.active {
+      opacity: 1;
+      & nav { display: block; }
+    }
+    /* Make the collapsed ToC header render white on gray also when it's a link */
+    & h2 a,
+    & h2 a:is(:link, :focus, :hover),
+    & a.toplink,
+    & a.toplink:hover {
+      color: white;
+      background-color: #444;
+      text-decoration: none;
+    }
+    & a.toplink {
+      margin: 2px 0.5em 0;
+    }
+  }
+}
+
+/* TOC layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+    & h2 {
+      margin: 0;
+      padding: 0.25em 1em 1em 0;
+    }
+    & nav {
+      display: block;
+      height: calc(90vh - 84px);
+      bottom: 0;
+      padding: 0.5em 0 2em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+    }
+    & a.toplink {
+      margin: 8px 0.5em 0;
+    }
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc {
+    page-break-before: always;
+    border-top: none;
+    padding-top: 0;
+  }
+  #n-introduction {
+    page-break-before: always;
+  }
+  figure, pre, .vcard {
+    page-break-inside: avoid;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  :is(h2, h3, h4, h5, h6)+*, dd {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg {
+  & :is([stroke="black"], [stroke^="#000"]) {
+    stroke: var(--text-color);
+  }
+  & :is([stroke="white"], [stroke^="#fff"]) {
+    stroke: var(--background-color);
+  }
+  & :is([fill="black"], [fill^="#000"], :not([fill])) {
+    fill: var(--text-color);
+  }
+  & :is([fill="white"], [fill^="#fff"]) {
+    fill: var(--background-color);
+  }
+}
+</style>
+
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">AgentProto Arch</td>
+<td class="right">October 2026</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Rosenberg, et al.</td>
+<td class="center">Expires 3 May 2027</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">Agent Communication Protocols</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-manyfolks-agentproto-arch-latest</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2026-10-30" class="published">30 October 2026</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Informational</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2027-05-03">3 May 2027</time></dd>
+<dt class="label-authors">Authors:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">J. Rosenberg</div>
+<div class="org">jdrosen.net</div>
+</div>
+<div class="author">
+      <div class="author-name">Z. Sarker</div>
+<div class="org">Nokia</div>
+</div>
+<div class="author">
+      <div class="author-name">T. Reddy</div>
+<div class="org">Nokia</div>
+</div>
+<div class="author">
+      <div class="author-name">K. Yao</div>
+<div class="org">China Mobile</div>
+</div>
+<div class="author">
+      <div class="author-name">D. Liu</div>
+<div class="org">Alibaba</div>
+</div>
+<div class="author">
+      <div class="author-name">S. Krishnan</div>
+<div class="org">Cisco</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">Architecture for AI Agent Communications on the Internet</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">This document defines the terminology and architecture for AI agent communications protocols over the Internet. It provides the foundational architectural elements for the Agent Communications Protocol (ACP) - also known as agentproto - a new protocol to be developed in the IETF. ACP enables communication between user agent clients and AI agents, between AI Agents and other AI Agents, or between AI Agents and tools. All three of these interaction patterns - and the many use cases therein - require a session-like protocol which handles lifecycle management, including creation, modification, deletion and so on - along with the exchange of input and output. These session-like associations can be extremely long lived - running for hours or even days - and span multiple IP hosts used by both the principal and by the agent. They can also be highly intermittent with asynchronous responses. All of these mean a new type of protocol is needed.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<section class="note rfcEditorRemove" id="section-note.1">
+      <h2 id="name-about-this-document">
+<a href="#name-about-this-document" class="section-name selfRef">About This Document</a>
+      </h2>
+<p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+<p id="section-note.1-2">
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-manyfolks-agentproto-arch/">https://datatracker.ietf.org/doc/draft-manyfolks-agentproto-arch/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+<p id="section-note.1-3">
+        Discussion of this document takes place on the
+        Agent Communication Protocols Working Group mailing list (<span><a href="mailto:agentproto@ietf.org">mailto:agentproto@ietf.org</a></span>),
+        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/agentproto">https://mailarchive.ietf.org/arch/browse/agentproto</a></span>.
+        Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/agentproto/">https://www.ietf.org/mailman/listinfo/agentproto/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+<p id="section-note.1-4">Source for this draft and an issue tracker can be found at
+        <span><a href="https://github.com/jdrosen/draft-rosenberg-agentproto-requirements">https://github.com/jdrosen/draft-rosenberg-agentproto-requirements</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 3 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2026 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-terminology" class="internal xref">Terminology</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-interaction-pattern" class="internal xref">Interaction Pattern</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1" class="keepWithNext"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-user-agent-to-ai-agent" class="internal xref">User Agent to AI Agent</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-ai-agent-to-a-session-orien" class="internal xref">AI Agent to a Session Oriented Tool</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-ai-agent-to-ai-agent" class="internal xref">AI Agent to AI Agent</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-core-concept-agentic-dialog" class="internal xref">Core Concept: Agentic Dialog</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-definitional-properties" class="internal xref">Definitional Properties</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1.2.1">
+                    <p id="section-toc.1-1.4.2.1.2.1.1"><a href="#section-4.1.1" class="auto internal xref">4.1.1</a>.  <a href="#name-conversational-continuity" class="internal xref">Conversational Continuity</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1.2.2">
+                    <p id="section-toc.1-1.4.2.1.2.2.1"><a href="#section-4.1.2" class="auto internal xref">4.1.2</a>.  <a href="#name-driven-by-natural-language" class="internal xref">Driven by Natural Language</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-additional-properties" class="internal xref">Additional Properties</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.1">
+                    <p id="section-toc.1-1.4.2.2.2.1.1"><a href="#section-4.2.1" class="auto internal xref">4.2.1</a>.  <a href="#name-it-has-a-start" class="internal xref">It has a Start</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.2">
+                    <p id="section-toc.1-1.4.2.2.2.2.1"><a href="#section-4.2.2" class="auto internal xref">4.2.2</a>.  <a href="#name-it-may-be-long-lived" class="internal xref">It may be Long Lived</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.3">
+                    <p id="section-toc.1-1.4.2.2.2.3.1"><a href="#section-4.2.3" class="auto internal xref">4.2.3</a>.  <a href="#name-input-can-be-intermittent" class="internal xref">Input can be Intermittent</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.4">
+                    <p id="section-toc.1-1.4.2.2.2.4.1"><a href="#section-4.2.4" class="auto internal xref">4.2.4</a>.  <a href="#name-output-can-be-delayed" class="internal xref">Output can be Delayed</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.5">
+                    <p id="section-toc.1-1.4.2.2.2.5.1"><a href="#section-4.2.5" class="auto internal xref">4.2.5</a>.  <a href="#name-it-might-or-might-not-end" class="internal xref">It Might or Might Not End</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.6">
+                    <p id="section-toc.1-1.4.2.2.2.6.1"><a href="#section-4.2.6" class="auto internal xref">4.2.6</a>.  <a href="#name-output-can-be-asynchronous" class="internal xref">Output can be Asynchronous</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.7">
+                    <p id="section-toc.1-1.4.2.2.2.7.1"><a href="#section-4.2.7" class="auto internal xref">4.2.7</a>.  <a href="#name-agents-are-identified-by-a-" class="internal xref">Agents are Identified by a URI</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.8">
+                    <p id="section-toc.1-1.4.2.2.2.8.1"><a href="#section-4.2.8" class="auto internal xref">4.2.8</a>.  <a href="#name-client-vs-principal-and-ser" class="internal xref">Client vs Principal and Server vs. Agent</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.9">
+                    <p id="section-toc.1-1.4.2.2.2.9.1"><a href="#section-4.2.9" class="auto internal xref">4.2.9</a>.  <a href="#name-acp-manages-dialog-context-" class="internal xref">ACP Manages Dialog Context - not LLM Context</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.10">
+                    <p id="section-toc.1-1.4.2.2.2.10.1"><a href="#section-4.2.10" class="auto internal xref">4.2.10</a>. <a href="#name-log-content-is-opaque-to-ac" class="internal xref">Log Content is Opaque to ACP</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.11">
+                    <p id="section-toc.1-1.4.2.2.2.11.1"><a href="#section-4.2.11" class="auto internal xref">4.2.11</a>. <a href="#name-output-isnt-just-the-respon" class="internal xref">Output Isnt Just the Response</a></p>
+</li>
+                </ul>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-network-architecture-diagra" class="internal xref">Network Architecture Diagram</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-functional-decomposition" class="internal xref">Functional Decomposition</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-agentic-dialog-management" class="internal xref">Agentic Dialog Management</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1.2.1">
+                    <p id="section-toc.1-1.6.2.1.2.1.1"><a href="#section-6.1.1" class="auto internal xref">6.1.1</a>.  <a href="#name-agentic-dialog-identifier-a" class="internal xref">Agentic Dialog Identifier and Correlation</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1.2.2">
+                    <p id="section-toc.1-1.6.2.1.2.2.1"><a href="#section-6.1.2" class="auto internal xref">6.1.2</a>.  <a href="#name-lifecycle" class="internal xref">Lifecycle</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1.2.3">
+                    <p id="section-toc.1-1.6.2.1.2.3.1"><a href="#section-6.1.3" class="auto internal xref">6.1.3</a>.  <a href="#name-exchange" class="internal xref">Exchange</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1.2.4">
+                    <p id="section-toc.1-1.6.2.1.2.4.1"><a href="#section-6.1.4" class="auto internal xref">6.1.4</a>.  <a href="#name-recovery" class="internal xref">Recovery</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1.2.5">
+                    <p id="section-toc.1-1.6.2.1.2.5.1"><a href="#section-6.1.5" class="auto internal xref">6.1.5</a>.  <a href="#name-structured-error-and-progre" class="internal xref">Structured Error and Progress Signaling</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1.2.6">
+                    <p id="section-toc.1-1.6.2.1.2.6.1"><a href="#section-6.1.6" class="auto internal xref">6.1.6</a>.  <a href="#name-cancellation-and-interrupti" class="internal xref">Cancellation and Interruption</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-authorization-and-delegatio" class="internal xref">Authorization and Delegation</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2.2.1">
+                    <p id="section-toc.1-1.6.2.2.2.1.1"><a href="#section-6.2.1" class="auto internal xref">6.2.1</a>.  <a href="#name-delegation" class="internal xref">Delegation</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
+                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-identity-management" class="internal xref">Identity Management</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.1">
+                    <p id="section-toc.1-1.6.2.3.2.1.1"><a href="#section-6.3.1" class="auto internal xref">6.3.1</a>.  <a href="#name-identity-roles" class="internal xref">Identity Roles</a></p>
+</li>
+                </ul>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-security" class="internal xref">Security</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-agent-identity" class="internal xref">Agent Identity</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
+                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-channel-protection" class="internal xref">Channel Protection</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
+                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-intent-execution-separation" class="internal xref">Intent-Execution Separation</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
+                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-delegation-chain-integrity" class="internal xref">Delegation Chain Integrity</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.5">
+                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="auto internal xref">7.5</a>.  <a href="#name-audit-and-non-repudiation" class="internal xref">Audit and Non-Repudiation</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-transport-aspects" class="internal xref">Transport Aspects</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-delivery-semantics" class="internal xref">Delivery Semantics</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-message-exchange-patterns" class="internal xref">Message Exchange Patterns</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3">
+                <p id="section-toc.1-1.8.2.3.1"><a href="#section-8.3" class="auto internal xref">8.3</a>.  <a href="#name-priority-and-scheduling" class="internal xref">Priority and Scheduling</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-applicability-of-existing-i" class="internal xref">Applicability of Existing IETF Work</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-profile-or-extend" class="internal xref">Profile or Extend</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-privacy-considerations" class="internal xref">Privacy Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#section-12" class="auto internal xref">12</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#section-13" class="auto internal xref">13</a>. <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1">
+                <p id="section-toc.1-1.13.2.1.1"><a href="#section-13.1" class="auto internal xref">13.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.2">
+                <p id="section-toc.1-1.13.2.2.1"><a href="#section-13.2" class="auto internal xref">13.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
+            <p id="section-toc.1-1.14.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
+            <p id="section-toc.1-1.15.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="intro">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">The widespread usage of AI Agents on the Internet has introduced new forms of networked communications. User agent clients connect to AI agents running elsewhere, AI agents communicate with other AI agents, and AI agents communicate with tools. All three of these interaction patterns - and the many use cases therein - require a session-like protocol which handles lifecycle management, including creation, modification, deletion and so on - along with the exchange of input and output. These session-like associations can be extremely long lived - running for hours or even days - and span multiple IP hosts used by both the principal and by the agent. They can also be highly intermittent with asynchronous responses. All of these mean a new type of protocol is needed.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">These differ from the type of sessions created by the Session Initiation Protocol (SIP) <span>[<a href="#RFC3261" class="cite xref">RFC3261</a>]</span>, which are shorter lived and work between a single IP host for each participant.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">This document introduces concepts, terminology, reference architecture and protocol functional blocks for ACP, which manages agentic dialogs. An agentic dialog is defined as a session between two parties - a principal whose role is to provide input to, and receive output from, an agent - and the agent, which is running a process which has properties which are agentic in nature. The agentic properties that are relevant here are (1) conversational continuity, and (2) driven by natural language in each direction. These concepts are discussed in more detail in this document.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">This document breaks ACP down into three functional blocks - agentic dialog management, authorization and delegation, and identity management. As a session-like protocol, ACP rides on top of transport protocols. This document identifies requirements of these transport protocols to aid in their selection.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-5">The use cases and requirements that drive this architecture are described in
+<span>[<a href="#I-D.agentic-ai-usecases-requirements" class="cite xref">I-D.agentic-ai-usecases-requirements</a>]</span> and <span>[<a href="#I-D.rosenberg-aiproto-framework" class="cite xref">I-D.rosenberg-aiproto-framework</a>]</span>. The wire formats and protocol elements of the agent communication protocol are outside the scope of this document. This document describes the functional
+decomposition of the reference architecture.<a href="#section-1-5" class="pilcrow">¶</a></p>
+<p id="section-1-6">MCP <span>[<a href="#MCP" class="cite xref">MCP</a>]</span> and A2A <span>[<a href="#A2A" class="cite xref">A2A</a>]</span> are application-layer protocols
+maintained by the Linux Foundation. They use IETF protocols such as HTTP,
+OAuth 2.0, and TLS. MCP addresses agent-to-tool interactions, and A2A
+addresses agent-to-agent interactions. The agent communication protocol in
+this architecture is intended to be usable by these protocols through
+well-defined extension points, not to replace them.<a href="#section-1-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="terminology">
+<section id="section-2">
+      <h2 id="name-terminology">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-terminology" class="section-name selfRef">Terminology</a>
+      </h2>
+<span class="break"></span><dl class="dlParallel" id="section-2-1">
+        <dt id="section-2-1.1">AI Agent:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.2">
+          <p id="section-2-1.2.1">A software system that uses AI models to complete a task on behalf of a
+principal - which can be a user or another AI agent.<a href="#section-2-1.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.3">Principal:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.4">
+          <p id="section-2-1.4.1">An entity whose role is to provide input to, and receive output from, an agent.
+The principal can be a human user (as in the user agent to AI agent case noted above), but the principal can also be an AI agent - as in the A2A case.<a href="#section-2-1.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.5">User:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.6">
+          <p id="section-2-1.6.1">A human being who plays the role of the principal. In this document, the word "user" always implies a human being.<a href="#section-2-1.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.7">Agent:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.8">
+          <p id="section-2-1.8.1">An entity whose role is to receive input from a principal, use it to augment its context, and based on an intelligent processing of that context, generate output to be returned to the principal. Typically, an agent is an AI Agent, but ACP doesn't preclude a human from playing that role. For this reason, the ACP protocol uses the term "agent" instead of "AI Agent".<a href="#section-2-1.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.9">Task:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.10">
+          <p id="section-2-1.10.1">A unit of work submitted by a principal to an agent, typically expressed through the input provided to the agent which describes the task to be done. In some agentic dialogs, the task may evolve throughout its lifetime. In other agent dialogs, such as that used for communications between an AI agent and a tool, there may be just one. In other agentic dialogs, there is no real notion of task - it's just a conversation.<a href="#section-2-1.10.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.11">Context:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.12">
+          <p id="section-2-1.12.1">Context is central to the concept of AI Agents. There are many definitions on the Internet. Anthropic defines it as "the set of tokens included when sampling from a large-language model (LLM)." <span>[<a href="#anthropic-context-def" class="cite xref">anthropic-context-def</a>]</span>. The goal of ACP is to exchange the input from the principal to allow the agent to manage context, and the output from inference of that context. The context itself is invisible to ACP.<a href="#section-2-1.12.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.13">LLM Context:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.14">
+          <p id="section-2-1.14.1">Same as context. We used the adjective "LLM" in front of context to help differentiate LLM context from dialog context.<a href="#section-2-1.14.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.15">Agentic Dialog:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.16">
+          <p id="section-2-1.16.1">An association between two parties - a principal whose role is to provide input to, and receive output from, an agent - and the agent, which is running a process which has properties which are agentic in nature and result in the maintenance of LLM context. The agentic properties that are relevant here are (1) conversational continuity, and (2) driven by natural language in each direction. An agentic dialog is associated with the LLM context it builds. ACP doesn't define how the agent maintains the LLM context; it merely allows for the establishment of an agentic dialog and exchange of data which allows the agent to do so.<a href="#section-2-1.16.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.17">Input:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.18">
+          <p id="section-2-1.18.1">Information provided by the principal, which is used to drive the operation of the agent. In simplest terms, this is the stuff that the principal types or speaks to the AI agent, e.g., "I want to book a trip to Maui" or "That sounds like a good idea but what is the weather like that time of year?".<a href="#section-2-1.18.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.19">Output:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.20">
+          <p id="section-2-1.20.1">The information produced by the agent which are meant to be conveyed to the principal. There are three distinct forms of output - response, information, and progress.<a href="#section-2-1.20.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.21">Response Output:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.22">
+          <p id="section-2-1.22.1">This is the portion of the output which is meant to be shown to the user, and is what the user needs to know to decide their next input. For example, "I've booked that trip for you. Do you need a car too?". The output can of course constitute any modality.<a href="#section-2-1.22.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.23">Information Output:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.24">
+          <p id="section-2-1.24.1">This is the portion of the output which helps the principal understand what the agent has done, but is not necessarily required for them to compose their input. This includes tool call summaries, reasoning, sub-agent invocations, and so on. Information output is content that the agent used to build its local context but is not necessary for the principal to know.<a href="#section-2-1.24.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.25">Progress:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.26">
+          <p id="section-2-1.26.1">This is the portion of the output that provides updates on work to the principal. This includes token counts, time elapsed, usage progress, and so on. Progress output is informational in nature, like information output, but it has the important distinction that it is not data the agent used to build its LLM context. As a result, it is almost always generated by the agent harness and not the LLM itself.<a href="#section-2-1.26.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.27">Dialog Context:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.28">
+          <p id="section-2-1.28.1">Dialog context refers to the state maintained by, and exchanged via, the ACP protocol. Each agentic dialog is associated 1-1 with an instance of dialog context. The dialog context has two primary elements - meta-data and the log. Meta-data is the set of information that is required for the operation of the protocol itself, and includes protocol identifiers (such as the Agentic Dialog Identifier (ADID)), the identity of the principal, identities of the principals in any delegation chain, the URI for the agent, supported modalities, start time, and so on. The log is the append-only collection of the inputs provided by the principal, the outputs provided by the agent (inclusive of response, information and progress output). The log includes data across all modalities, including real-time voice and video, along with text, images and structured data.<a href="#section-2-1.28.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.29">Log:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.30">
+          <p id="section-2-1.30.1">The portion of the dialog context that is the append-only sequence of input from the principal and output (response, information and progress) from the agent.<a href="#section-2-1.30.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.31">Agentic Dialog Identifier (ADID):</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.32">
+          <p id="section-2-1.32.1">An identifier which identifies an agentic dialog and the context associated with it. This identifier survives network interruption or change.<a href="#section-2-1.32.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.33">Modality:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.34">
+          <p id="section-2-1.34.1">A category of data exchanged in an agentic dialog, such as text, audio, image, video or structured data.<a href="#section-2-1.34.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.35">Progress Signaling:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.36">
+          <p id="section-2-1.36.1">The act of providing progress output from the agent to the principal.<a href="#section-2-1.36.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.37">Administrative Domain:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.38">
+          <p id="section-2-1.38.1">A set of entities, such as agents, tools, and principals, that are
+subject to a common authorization policy and a common authority.<a href="#section-2-1.38.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.39">Agent Identity:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.40">
+          <p id="section-2-1.40.1">Identity information associated with an AI agent, distinct from the
+identity of the user on whose behalf it acts, and used for
+authentication, authorization, and accountability.<a href="#section-2-1.40.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.41">Delegation:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.42">
+          <p id="section-2-1.42.1">The act of an AI agent requesting another AI agent to execute a task on
+its behalf.<a href="#section-2-1.42.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.43">Tool:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.44">
+          <p id="section-2-1.44.1">A service invoked by an AI agent to retrieve data or perform operations.
+A tool is not necessarily an AI agent. However, in some cases a tool can be session-oriented in nature.<a href="#section-2-1.44.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.45">Trust Boundary:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.46">
+          <p id="section-2-1.46.1">A boundary between administrative domains.<a href="#section-2-1.46.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-1.47">Message:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-1.48">
+          <p id="section-2-1.48.1">A discrete unit of communication exchanged between the principal and agent<a href="#section-2-1.48.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="interaction-pattern">
+<section id="section-3">
+      <h2 id="name-interaction-pattern">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-interaction-pattern" class="section-name selfRef">Interaction Pattern</a>
+      </h2>
+<p id="section-3-1">ACP targets three distinct interaction patterns:<a href="#section-3-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3-2">
+<pre>
++-------------+
+| User /      |
+| Principal   |
++------+------+
+ (ACP) |
+       v
++-------------+        +--------+
+|  Agent (A)  |-------&gt;|  Tool  |
++------+------+ (ACP.  +--------+
+  (ACP)|         other)
+       V
++-------------+        +--------+
+|  Agent (B)  |-------&gt;|  Tool  |
++------+------+ (ACP,  +--------+
+                 other)
+</pre><a href="#section-3-2" class="pilcrow">¶</a>
+</div>
+<div id="user-agent-to-ai-agent">
+<section id="section-3.1">
+        <h3 id="name-user-agent-to-ai-agent">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-user-agent-to-ai-agent" class="section-name selfRef">User Agent to AI Agent</a>
+        </h3>
+<p id="section-3.1-1">In this interaction pattern, a human user (which we'll just refer to as a user) is sitting in front of a desktop application, mobile application, or web application providing a user interface for engaging with an AI agent. The AI agent runs elsewhere - on a server - different from the user agent. In this pattern, the user agent is really a "thin client" of sorts -  passing information from the user to the AI Agent, and passing information from the AI Agent to the user. This communications protocol would pass user messages, AI agent responses, meta-data like token usage, sub-agent spawns and completions, and so on. If the AI agent supports voice input and spoken output, the communications protocol would pass real-time voice information back and forth as well.  Basically - all of the information needed to render the UI.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2">If the user agent is a thick desktop application, the communications protocol is from the user's desktop to the AI agent on the server. In a mobile app, it is from their mobile app to the AI agent on the server. If the user agent is a web application, it is most likely from the web server to the server on which the AI agent is running.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.1-3">This interaction pattern is different from how desktop AI agents like Claude work today. Those have the AI agent running co-resident with the user interface. There is communications with a server elsewhere, but it takes the form of model invocation and tool invocation.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+<p id="section-3.1-4">When the vendor of the AI agent is the same as the vendor of the user agent, there is not necessarily a need for standardized protocols between them. However, standardized protocols can be helpful in cases when the user agent is an embedded device made by a different vendor than the one making AI agents. For example, consider a case where a user has a smart speaker (similar to Amazon Alexa). However, the smart speaker is made by one vendor (say, Bose, who makes such devices), and the desire is to allow the smart speaker to connect with AI agents made by many vendors - Anthropic, OpenAI, Google, or even B2B AI agents. In this kind of case, when the cardinality of AI agent vendors is high, there is a strong need for a standardized protocol here.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="ai-agent-to-a-session-oriented-tool">
+<section id="section-3.2">
+        <h3 id="name-ai-agent-to-a-session-orien">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-ai-agent-to-a-session-orien" class="section-name selfRef">AI Agent to a Session Oriented Tool</a>
+        </h3>
+<p id="section-3.2-1">In this interaction pattern, an AI agent is running somewhere - a user's desktop, or perhaps on a server. The AI agent wishes to invoke a tool. However, this tool is not just a simple one that performs a request/response transaction. Examples of a simple input and output tool would be a traditional REST API, or a tool that is exposed through the A2T (Agent to Tool) protocol <span>[<a href="#I-D.rosenberg-aiproto-a2t" class="cite xref">I-D.rosenberg-aiproto-a2t</a>]</span>. These are transactional, stateless API calls. There is no session - nothing long lived.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.2-2">However, there are cases where the tool itself is session oriented. The primary example is the Model Context Protocol (MCP) which is session oriented. The tool might also be agentic in nature - taking structured data as input, providing it ultimately as output, but requiring interaction with the user back and forth in order to fulfill the request.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="ai-agent-to-ai-agent">
+<section id="section-3.3">
+        <h3 id="name-ai-agent-to-ai-agent">
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-ai-agent-to-ai-agent" class="section-name selfRef">AI Agent to AI Agent</a>
+        </h3>
+<p id="section-3.3-1">In this interaction pattern, two AI agents are running in different places. Perhaps they are made by different vendors but running in the same domain. An example might be an enterprise running AI agents from a CRM vendor, which communicate with AI agents made by a provisioning system vendor. They may be in different domains. Or they may be distinct agents made by the same vendor, split up into separate agents on different servers for reasons of scale or isolation.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+<p id="section-3.3-2">This is the core interaction pattern for A2A {A2A}.<a href="#section-3.3-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="core-concept-agentic-dialog">
+<section id="section-4">
+      <h2 id="name-core-concept-agentic-dialog">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-core-concept-agentic-dialog" class="section-name selfRef">Core Concept: Agentic Dialog</a>
+      </h2>
+<p id="section-4-1">When we look at all of the interaction patterns, there is a common theme which runs through all of them - the notion of a long-lived association between two entities, with a growing context window as the interaction progresses, with a defined start and eventual finish. That's a mouthful, so we propose a specific name for this - an agentic dialog.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">An agentic dialog is defined as an association between two parties - a principal whose role is to provide input to, and receive output from, an agent - and the agent, which is running a process which has properties which are agentic in nature. The agentic properties that are relevant here are (1) conversational continuity, and (2) driven by natural language in each direction.<a href="#section-4-2" class="pilcrow">¶</a></p>
+<p id="section-4-3">The principal can be a human user (as in the user agent to AI agent case noted above), but the principal can also be an AI agent - as in the A2A case. The agent is typically an AI Agent, but it could be another human,  with that human being receiving the input and providing output. In this way, the term "agent" defined here refers strictly to the role in the protocol, which can be fulfilled by a human agent, an AI agent, or even traditional software. Indeed, in the A2T case, the agent might be a piece of software which supports only a small amount of conversational capability.<a href="#section-4-3" class="pilcrow">¶</a></p>
+<p id="section-4-4">The agentic dialog is facilitated by a protocol, which runs between a client (acting on behalf of the principal) and a server (acting on behalf of the agent). These distinctions are important, because the protocol needs to communicate information which is sometimes relevant only to the client (such as an identifier for the agentic dialog), and sometimes information relevant only to the principal - such as the text that is communicated. This layering is similar to how other Internet protocols operate, e.g, email - which has distinct concepts of envelope (meant for the mail agent) and the body (relevant for the recipient).<a href="#section-4-4" class="pilcrow">¶</a></p>
+<div id="definitional-properties">
+<section id="section-4.1">
+        <h3 id="name-definitional-properties">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-definitional-properties" class="section-name selfRef">Definitional Properties</a>
+        </h3>
+<p id="section-4.1-1">An agentic dialog is distinct from typical protocol sessions - like a SIP dialog -  because of two key properties.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<div id="conversational-continuity">
+<section id="section-4.1.1">
+          <h4 id="name-conversational-continuity">
+<a href="#section-4.1.1" class="section-number selfRef">4.1.1. </a><a href="#name-conversational-continuity" class="section-name selfRef">Conversational Continuity</a>
+          </h4>
+<p id="section-4.1.1-1">Conversational continuity means that, as far as the principal is concerned, the output generated by the agent appears as if any output has propertly taken into account all of the prior inputs and outputs shared between them. Typically, this is accomplished through LLM context that is built on the agent. The agent initializes its LLM context at the start of the dialog - perhaps even reusing a prior LLM context - and as the dialog progresses, the LLM context evolves as the principal provides input, and the LLM performs inference. The LLM context may be compacted if it gets too long, but the compaction serves the primary purpose of preserving continuity - retaining what is important so that, to the principal, it is almost as if there was no compaction or loss of information.<a href="#section-4.1.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1.1-2">The LLM context is used by the agent to determine how to satisfy the needs of the principal as specified via input. Those needs may evolve over time.<a href="#section-4.1.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.1.1-3">As such, each agentic dialog is associated with the LLM context which it feeds, and is fed by. The protocol has no constraints on how an agent associates the agentic dialog with LLM context. Indeed, an agent could decide to reuse LLM context across agentic dialogs, at its discretion.<a href="#section-4.1.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="driven-by-natural-language">
+<section id="section-4.1.2">
+          <h4 id="name-driven-by-natural-language">
+<a href="#section-4.1.2" class="section-number selfRef">4.1.2. </a><a href="#name-driven-by-natural-language" class="section-name selfRef">Driven by Natural Language</a>
+          </h4>
+<p id="section-4.1.2-1">In an agentic dialog, the input from the principal to the agent, and output from the agent back to the principal, contain natural language, in written, audio, video, or image form, or even structured data. We use the term "natural language" pretty loosely here. If a user is talking to an AI agent to modify an image, the user might send the image they want modified. This image is a form of "natural language" in our definition. The notion here is that it is processed according to a human or human-like understanding of why the image is being sent. The same is true for structured data - for example a piece of software. The agent may generate a Java file, and send it back to the principal. The information being shared is structured - it is source code - but it is understood as code for a specific purpose based on the context of the conversation.<a href="#section-4.1.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.1.2-2">This means that a protocol for managing agentic dialogs needs to be able to convey these various forms of content in both directions.<a href="#section-4.1.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="additional-properties">
+<section id="section-4.2">
+        <h3 id="name-additional-properties">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-additional-properties" class="section-name selfRef">Additional Properties</a>
+        </h3>
+<p id="section-4.2-1">Agentic dialogs have other properties which are impactful on the protocol.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<div id="it-has-a-start">
+<section id="section-4.2.1">
+          <h4 id="name-it-has-a-start">
+<a href="#section-4.2.1" class="section-number selfRef">4.2.1. </a><a href="#name-it-has-a-start" class="section-name selfRef">It has a Start</a>
+          </h4>
+<p id="section-4.2.1-1">Perhaps obvious but worth stating. The agentic dialog has a start. This start is the point at which the dialog context and LLM context are both initialized. The LLM context may not be initialized as empty; the agent might use the identity of the principal to add personalization. Or, it may be a coding agent which reads an agents.md file to initialize what it is doing. It might read system instructions. For the agent to behave properly, it needs to be told that a particular agentic dialog is starting. The log portion of the dialog context is, however, initialized as empty.<a href="#section-4.2.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="it-may-be-long-lived">
+<section id="section-4.2.2">
+          <h4 id="name-it-may-be-long-lived">
+<a href="#section-4.2.2" class="section-number selfRef">4.2.2. </a><a href="#name-it-may-be-long-lived" class="section-name selfRef">It may be Long Lived</a>
+          </h4>
+<p id="section-4.2.2-1">The agentic dialog may last a really long time. By "last" we mean that the dialog context which is its defining property, may continue to exist and be accessible by the principal for long periods of time.<a href="#section-4.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.2-2">One example is an agentic dialog between a principal and agent that is used for a therapy session. A human user is connected to a client on their desktop; the server is running an AI agent which acts as a virtual therapist. The agentic dialog continues for months.<a href="#section-4.2.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="input-can-be-intermittent">
+<section id="section-4.2.3">
+          <h4 id="name-input-can-be-intermittent">
+<a href="#section-4.2.3" class="section-number selfRef">4.2.3. </a><a href="#name-input-can-be-intermittent" class="section-name selfRef">Input can be Intermittent</a>
+          </h4>
+<p id="section-4.2.3-1">The input from the principal can be intermittent. As an example, consider a user that is using a coding agent, and they have a period of activity where they are typing at it and getting responses, and then they head to bed at some point. The user comes back in the morning to continue the agentic dialog.<a href="#section-4.2.3-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.3-2">In this case, if the user's the client was on their desktop, and the agent was an AI agent on a server in a cloud somewhere, there is no user input (and potentially no AI Agent output) throughout the entire evening, and no data transmitted from the users' home network towards the Internet through the evening.<a href="#section-4.2.3-2" class="pilcrow">¶</a></p>
+<p id="section-4.2.3-3">This means the protocol needs to account for alternating periods of activity and quiesence. And, because the agentic dialog can be long-lived, the actual IP host which is acting as the client or the server might change over the lifecycle of the agentic dialog.<a href="#section-4.2.3-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="output-can-be-delayed">
+<section id="section-4.2.4">
+          <h4 id="name-output-can-be-delayed">
+<a href="#section-4.2.4" class="section-number selfRef">4.2.4. </a><a href="#name-output-can-be-delayed" class="section-name selfRef">Output can be Delayed</a>
+          </h4>
+<p id="section-4.2.4-1">The output from the agent could arrive a long time after the input has been sent. Anyone who has used a coding agent is familiar with this - it can sometimes take many minutes before the first response is returned.<a href="#section-4.2.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="it-might-or-might-not-end">
+<section id="section-4.2.5">
+          <h4 id="name-it-might-or-might-not-end">
+<a href="#section-4.2.5" class="section-number selfRef">4.2.5. </a><a href="#name-it-might-or-might-not-end" class="section-name selfRef">It Might or Might Not End</a>
+          </h4>
+<p id="section-4.2.5-1">Agentic dialogs can have a formal end, in which case it is not possible for the principal to contribute further to it. If an agentic dialog ends but is actually resumable, it hasnt really ended. Since the agent takes ownership for continued maintenance of both the dialog and LLM context, it needs the ability to declare that it is no longer supporting this context, and ending the dialog. Similarly, a principal should be able to say "I'm done" giving permission for the agent to immediately delete the context associated with the agentic dialog.<a href="#section-4.2.5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="output-can-be-asynchronous">
+<section id="section-4.2.6">
+          <h4 id="name-output-can-be-asynchronous">
+<a href="#section-4.2.6" class="section-number selfRef">4.2.6. </a><a href="#name-output-can-be-asynchronous" class="section-name selfRef">Output can be Asynchronous</a>
+          </h4>
+<p id="section-4.2.6-1">In early chatbots, each user input created a single user output, resulting in a simple turn-by-turn model of a conversation.<a href="#section-4.2.6-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.6-2">Modern AI Agents can invoke tools that include background activities. As a result, a single principal input might generate any number of agent outputs, and some of those outputs can come seconds, minutes, or even hours after the initial input.<a href="#section-4.2.6-2" class="pilcrow">¶</a></p>
+<p id="section-4.2.6-3">This complicates the protocol significantly. If the agent needs to generate a response, and that response comes long after the request which triggered it, the server cannot assume the client is still running on the same IP host. Historically, IP protocols have solved for these use cases with webhooks, requiring the client to run its own HTTP server.<a href="#section-4.2.6-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="agents-are-identified-by-a-uri">
+<section id="section-4.2.7">
+          <h4 id="name-agents-are-identified-by-a-">
+<a href="#section-4.2.7" class="section-number selfRef">4.2.7. </a><a href="#name-agents-are-identified-by-a-" class="section-name selfRef">Agents are Identified by a URI</a>
+          </h4>
+<p id="section-4.2.7-1">When a principal establishes an agentic dialog with an agent, it is attempting to do so to a particular agent, identified by a URI. The usage of a URI allows an administrative domain to have as many agents as it likes. One can imagine a vendor having different agents with different personas - a contact center AI agent which handles sales vs. support, or a virtual knowledge worker from Salesforce that handles accounting vs. one that handles legal issues. Different agents may be distinct through differing LLM model, instructions, prompts, guardrails and other aspects of the harness which define its behavior. How they differ is up to implementations and not defined by ACP.<a href="#section-4.2.7-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.7-2">When the principal connects to the agent through its client to initiate an agentic dialog, the client provides the URI of the agent it is connecting to. How the principal obtained that URI is outside the scope of the protocol, and could come through provisioning, hyperlinks, or discovery techniques.<a href="#section-4.2.7-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="client-vs-principal-and-server-vs-agent">
+<section id="section-4.2.8">
+          <h4 id="name-client-vs-principal-and-ser">
+<a href="#section-4.2.8" class="section-number selfRef">4.2.8. </a><a href="#name-client-vs-principal-and-ser" class="section-name selfRef">Client vs Principal and Server vs. Agent</a>
+          </h4>
+<p id="section-4.2.8-1">There is a distinction between the principal and the client. The principal exists outside of the protocol; the role of the protocol is to collect input from the principal, and to provide output back to the principal. In traditional protocols we'd use the word "user" to represent the human driving the protocol, and not "principal". However, that terminology doesn't work here because the principal can be an AI agent which is not a human being. The word "principal" is agnostic to whether it is a human being or an AI Agent. The software element - and it is a piece of traditional software implementing ACP - is called the client.<a href="#section-4.2.8-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.8-2">In the same way, the "agent" exists outside of the protocol as well. It is an AI agent, though it could be a human being. The server is the piece of software - also traditional software - which implements ACP and is responsible for funneling information to and from the AI Agent.<a href="#section-4.2.8-2" class="pilcrow">¶</a></p>
+<p id="section-4.2.8-3">This distinction is important because it helps us understand how to properly layer the system.<a href="#section-4.2.8-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="acp-manages-dialog-context-not-llm-context">
+<section id="section-4.2.9">
+          <h4 id="name-acp-manages-dialog-context-">
+<a href="#section-4.2.9" class="section-number selfRef">4.2.9. </a><a href="#name-acp-manages-dialog-context-" class="section-name selfRef">ACP Manages Dialog Context - not LLM Context</a>
+          </h4>
+<p id="section-4.2.9-1">The ACP protocol is not directly transmitting LLM context. The naive way to think about LLM context is that it is just a growing log that concatenates each piece of input sent from principal to agent, and each output from agent to principal. If that were true, there would be no distinction between the dialog context and LLM context. But, this is not the case.<a href="#section-4.2.9-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.9-2">Firstly, the LLM context is usually initialized with system instructions, which are never seen by the principal and never need to be seen by them. These are never transmitted on the wire by ACP, and do not form part of the dialog context. Similarly, if an agent loads a skill, the skill details are added to the context. However, those details are not transmitted over the wire by ACP, nor are they added to the dialog context. The dialog context would just indicate that the skill was loaded. Indeed, skills might be considered proprietary and it is an explicit goal of the vendor of the agent to not send them to anyone who uses the agent!<a href="#section-4.2.9-2" class="pilcrow">¶</a></p>
+<p id="section-4.2.9-3">What ACP does exchange, is input and output. Input is information the principal wishes to send to the agent, and output is information the agent wishes to send to the principal. The input and output are appended to form the log, the main part of the dialog context.<a href="#section-4.2.9-3" class="pilcrow">¶</a></p>
+<p id="section-4.2.9-4">ACP doesn't define how the agent evolves the LLM context based on the input, nor does it define how the output from the agent is funnelled into ACP. This means that ACP is seeing just the "on-the-wire" exchange, and that exchange is stored in the log that is part of the dialog context. The dialog context is associated 1-1 with the agentic dialog. However, the mapping of an agentic dialog to the LLM context is a matter of local implementation.<a href="#section-4.2.9-4" class="pilcrow">¶</a></p>
+<p id="section-4.2.9-5">The distinction between LLM context and dialog context also aligns with the distinction between server and agent. The LLM context is a core property of the agent, NOT of the server, whereas the dialog context is a property of the server, and not its associated agent. In ACP,  we are conveying information to and from the agent on the server, but the LLM context lives with the agent. The protocol will concern itself with technical conveyance issues necessary to make sure both client and server have an aligned view of the dialog context. But, how that dialog context is related to the LLM context is a matter of local implementation.<a href="#section-4.2.9-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="log-content-is-opaque-to-acp">
+<section id="section-4.2.10">
+          <h4 id="name-log-content-is-opaque-to-ac">
+<a href="#section-4.2.10" class="section-number selfRef">4.2.10. </a><a href="#name-log-content-is-opaque-to-ac" class="section-name selfRef">Log Content is Opaque to ACP</a>
+          </h4>
+<p id="section-4.2.10-1">The actual text, image, or video that form the input and output that build up the log are not actually processed by ACP. To ACP, they are opaque. ACP only cares about the meta-data of each log entry - identifiers, timestamps, and so on - in order to support exchange, synchronization, recovery and rehydration. A good analogy is the RTP protocol <span>[<a href="#RFC3550" class="cite xref">RFC3550</a>]</span>, which doesn't care about the payloads it conveys - it just conveys them. The actual content matters to the agent - and more specifically - the LLM - which runs inference on it to comprehend and respond. ACP just wants to move the data around.<a href="#section-4.2.10-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="output-isnt-just-the-response">
+<section id="section-4.2.11">
+          <h4 id="name-output-isnt-just-the-respon">
+<a href="#section-4.2.11" class="section-number selfRef">4.2.11. </a><a href="#name-output-isnt-just-the-respon" class="section-name selfRef">Output Isnt Just the Response</a>
+          </h4>
+<p id="section-4.2.11-1">The output has three distinct elements:<a href="#section-4.2.11-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.2.11-2.1">
+              <p id="section-4.2.11-2.1.1">Responses: This is the output of the agent which needs to be rendered to the principal for them to make a decision on what to do next. Examples include text responses, like "I've booked that trip for you, do you need a car?", images - such as a photo of a hotel or a rendered image from an image-generation agent, real-time voice - used by live agents that interact with principals over real-time voice, common in contact center applications for example, real-time video - an emerging output modality used by agents that are represented by talking-heads, able to move their mouths, make facial expressions and so on. Of course, it also includes structured data - for example a JSON object or HTML page.<a href="#section-4.2.11-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4.2.11-2.2">
+              <p id="section-4.2.11-2.2.1">Information: This is the output of the agent which is useful for the principal to know, and is used by the agent as part of its LLM context - but is not necessarily essential for the principal to observe in order to determine their next input. Examples of this include tool calls, sub-agent invocations, and reasoning.<a href="#section-4.2.11-2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4.2.11-2.3">
+              <p id="section-4.2.11-2.3.1">Progress: Whereas information output is generated by the LLM and fed back into the agents internal context, progress is data generated by the harness and is useful to understand status. This includes token counts, turn durations, and costs.<a href="#section-4.2.11-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-4.2.11-3">It is important to note that a piece of output in the dialog context is not necessarily exactly the same as what the agent adds to LLM context. For example, the agent may apply obfuscation to sensitive tool call results. Or, it may simplify the tool call output to facilitate comprehension by the principal, by omitting unimportant fields (a trace ID for example).<a href="#section-4.2.11-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="network-arch">
+<section id="section-5">
+      <h2 id="name-network-architecture-diagra">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-network-architecture-diagra" class="section-name selfRef">Network Architecture Diagram</a>
+      </h2>
+<p id="section-5-1">From these properties, we can draw a network architecture diagram which describes the entities between which ACP works.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-5-2">
+<pre>
+
+
+                                      +---------+    +---------+
+                                      | Dialog  |    |   LLM   |
+                                      | Context |    | Context |
+                                      +---------+    +---------+
+                                           |              |
+              +---------+    +---+    +---------+         |
+              | Client  |    |   |    | Server  |
+            +-+         +----+   +----+         +-+       |
+            | +---------+    |   |    +---------+ |       |
++---------+ | +---------+    |   |    +---------+ |  +----+----+
+|Principal+-+-+ Client  +----+IP +----+ Server  +-+--+  Agent  |
+|         | | |         |    |   |    |         | |  |         |
++---------+ | +---------+    |Net|    +---------+ |  +---------+
+            | +---------+    |   |    +---------+ |
+            +-+ Client  +----+   +----+ Server  +-+
+              |         |    |   |    |         |
+              +---------+    +---+    +---------+
+
+                        &lt;-----ACP-----&gt;
+
+</pre><a href="#section-5-2" class="pilcrow">¶</a>
+</div>
+<p id="section-5-3">The principal accesses the agent through one or more distinct clients over the lifetime of a specific agentic dialog. The notion of "distinct" here is that they can reside on different IP hosts. As noted in the examples above, in an A2A use case, the client might be on a virtual compute node A with a specific IP today, and then tomorrow the principal (an AI agent in this case) resumes the dialog from a different virtual compute node B with a different IP.<a href="#section-5-3" class="pilcrow">¶</a></p>
+<p id="section-5-4">In the same way, a particular named agent - and any instance of an agentic dialog created with that agent - can be accessed through a multiplicity of distinct servers - each of which is on a distinct host.<a href="#section-5-4" class="pilcrow">¶</a></p>
+<p id="section-5-5">ACP, as an on-the-wire protocol, runs over an IP network between the clients and servers.<a href="#section-5-5" class="pilcrow">¶</a></p>
+<p id="section-5-6">The ACP protocol is fundamentally two-party - it is between a principal and an agent. More complex topologies are supported by cascading together multiple independent agentic dialogs. For example, a user might connect to a an agent for banking, and that agent connects to a second agent for a mortgage quote. In this case, there are two distinct agentic dialogs, two unrelated instances of ACP. They are connected only through delegated identities and the chain of dialog context identifiers that are passed from one to the other.<a href="#section-5-6" class="pilcrow">¶</a></p>
+<p id="section-5-7">The clients and servers exist on IP hosts. The agent in the picture is conceptual in nature, and is not an IP host. It might be a human, but most often is an AI agent composed of a harness and LLM, building and using context fed by the input received from the server.<a href="#section-5-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="functional-decomposition">
+<section id="section-6">
+      <h2 id="name-functional-decomposition">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-functional-decomposition" class="section-name selfRef">Functional Decomposition</a>
+      </h2>
+<p id="section-6-1">We can think about the ACP protocol as have three core building blocks.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-6-2">
+<pre>
++----------------------------------------------------------------+
+|                Agent Communication Protocol                    |
+|                                                                |
+| +------------------+ +------------------+ +------------------+ |
+| | Agentic Dialog   | | Authorization    | | Identity         | |
+| | Management       | | and Delegation   | | Management       | |
+| |                  | |                  | |                  | |
+| | - Identifier     | | - Delegation     | | - Roles          | |
+| | - Lifecycle      | | - Authorization  | | - Principal      | |
+| | - Exchange       | | - Decision point | |   identity       | |
+| | - Recovery       | |                  | | - Credential     | |
+| |                  | |                  | |   reference      | |
+| +--------+---------+ +---------+--------+ +---------+--------+ |
+|                         Dialog Context                         |
++----------------------------------------------------------------+
+                                |
+                                v
++----------------------------------------------------------------+
+|                          Transport                             |
+|  - Multiplexed Streams                                         |
+|  - Per-stream Semantics                                        |
+|  - Connection continuity (Connection ID, TLS resumption)       |
+|  - Protocols: HTTP, QUIC, WebTransport, WebRTC, MoQT           |
++----------------------------------------------------------------+
+                                 |
+                                 v
++----------------------------------------------------------------+
+|                       Security                                 |
+|  - Channel Protection                                          |
+|  - Mutual Authentication                                       |
+|  - Protocol: TLS 1.3, WIT/WPT                                  |
++----------------------------------------------------------------+
+</pre><a href="#section-6-2" class="pilcrow">¶</a>
+</div>
+<div id="dialog">
+<section id="section-6.1">
+        <h3 id="name-agentic-dialog-management">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-agentic-dialog-management" class="section-name selfRef">Agentic Dialog Management</a>
+        </h3>
+<p id="section-6.1-1">Agentic dialog management is the central role of the protocol.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.1-2">Its role is to identify an agentic dialog, to provide lifecycle management for it, to exchange input and output used to grow dialog context, and to allow the agentic dialog to continue through the failure of clients, servers and network throughout its lifecycle. It can work within a single trust domain, or across trust domains.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.1-3">It is the building block that allows a dialog context to remain recognizable over multiple hops, over time,
+and across transport connections.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
+<div id="dialog-id">
+<section id="section-6.1.1">
+          <h4 id="name-agentic-dialog-identifier-a">
+<a href="#section-6.1.1" class="section-number selfRef">6.1.1. </a><a href="#name-agentic-dialog-identifier-a" class="section-name selfRef">Agentic Dialog Identifier and Correlation</a>
+          </h4>
+<p id="section-6.1.1-1">Every agentic dialog is required to have an agentic dialog identifier (ADID). The identifier is required to:<a href="#section-6.1.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.1.1-2.1">
+              <p id="section-6.1.1-2.1.1">correlate all messages that belong to the agentic dialog, in each direction<a href="#section-6.1.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.1.1-2.2">
+              <p id="section-6.1.1-2.2.1">survive the loss or replacement of a transport connection, so that the
+agentic dialog is not tied to a TCP connection, QUIC connection, or TLS
+association;<a href="#section-6.1.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.1.1-2.3">
+              <p id="section-6.1.1-2.3.1">be usable by an entity to link to distinct agentic dialogs, where one is triggered based on the other - for example, in sub-agent delegation.<a href="#section-6.1.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-6.1.1-3">The dialog identifier should be a UUID, unique in space and time, and unguessable. Knowledge of an ADID provides no information whatsoever about the agentic dialog. Knowledge of the ADID is also insufficient for a client to connect to the server and access the agentic dialog in any way - the client must also authenticate itself, and be authorized for such access.<a href="#section-6.1.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="lifecycle">
+<section id="section-6.1.2">
+          <h4 id="name-lifecycle">
+<a href="#section-6.1.2" class="section-number selfRef">6.1.2. </a><a href="#name-lifecycle" class="section-name selfRef">Lifecycle</a>
+          </h4>
+<p id="section-6.1.2-1">ACP needs to perform lifecycle management, covering:<a href="#section-6.1.2-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.1.2-2.1">
+              <p id="section-6.1.2-2.1.1">Initiation: beginning a new agentic dialog<a href="#section-6.1.2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.1.2-2.2">
+              <p id="section-6.1.2-2.2.1">Termination: ending an agentic dialog such that it cannot be resumed<a href="#section-6.1.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.1.2-2.3">
+              <p id="section-6.1.2-2.3.1">Suspension: Pausing input or output, so that there no longer remains any active transport level connection for exchaging that input or output. Suspension could be time based, or explicitly triggered.<a href="#section-6.1.2-2.3.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.1.2-2.4">
+              <p id="section-6.1.2-2.4.1">Resumption: Resuming input or output, requiring (if needed) creation or modification of transport connections to convey the input or output. Resumption also requires protocol agreement on whether the client needs to replay prior input, or whether the server had already processed it.<a href="#section-6.1.2-2.4.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.1.2-2.5">
+              <p id="section-6.1.2-2.5.1">Cancellation: cancellation of prior input<a href="#section-6.1.2-2.5.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-6.1.2-3">Agent interactions are often long-lived, interruption-prone, and delegated across multiple hops. Each agentic dialog is required to have an ADID that survives network interruption or change. If a transport connection is interrupted, an agent uses the ADID to re-associate the existing agentic dialog with the newly formed connection, instead of initiating a new agentic dialog. Of course, proper authentication is also required - knowledge of the ADID is insufficient for the newly formed connection to be associated to the agentic dialog.<a href="#section-6.1.2-3" class="pilcrow">¶</a></p>
+<p id="section-6.1.2-4">Similarly, an agent performing delegation uses the ADID to correlate the agentic dialog it terminates, with the one it initiates.<a href="#section-6.1.2-4" class="pilcrow">¶</a></p>
+<p id="section-6.1.2-5">Agentic Dialogs are defined above any transport protocol connection (TCP connection, QUIC connection) or TLS association. QUIC Connection ID and TLS resumption provide connection-level continuity; they preserve transport and cryptographic state, not agentic dialog state.<a href="#section-6.1.2-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="exchange">
+<section id="section-6.1.3">
+          <h4 id="name-exchange">
+<a href="#section-6.1.3" class="section-number selfRef">6.1.3. </a><a href="#name-exchange" class="section-name selfRef">Exchange</a>
+          </h4>
+<p id="section-6.1.3-1">ACP allows the principal, through the ACP client, to provide input to the agent, delivered via a server.<a href="#section-6.1.3-1" class="pilcrow">¶</a></p>
+<p id="section-6.1.3-2">The input constitutes many modalities, including voice, video, text (i.e., chat), images, and structured data. These modalities encompass both real-time (video and voice), and non-real-time (text, images, and structured data). In the case of A2A for example, the input might be a piece of text which describes the task to perform - a request to recognize an image, along with the image to recognize.<a href="#section-6.1.3-2" class="pilcrow">¶</a></p>
+<p id="section-6.1.3-3">ACP allows the principal to contribute input at any time, and the agent to provide output at any time.<a href="#section-6.1.3-3" class="pilcrow">¶</a></p>
+<p id="section-6.1.3-4">Output, like input, can contain all modalities. If a principal is providing input via real-time voice, the output might be real-time voice too. However, it can also include progress signaling, such as tool calls or skill loading, to be rendered on a UI.<a href="#section-6.1.3-4" class="pilcrow">¶</a></p>
+<p id="section-6.1.3-5">Not all agents and principals can handle all modalities. For this reason, ACP requires traditional negotiation capabilities, allowing them to be exchanged at the beginning of the agentic dialog.<a href="#section-6.1.3-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="recovery">
+<section id="section-6.1.4">
+          <h4 id="name-recovery">
+<a href="#section-6.1.4" class="section-number selfRef">6.1.4. </a><a href="#name-recovery" class="section-name selfRef">Recovery</a>
+          </h4>
+<p id="section-6.1.4-1">As noted in {#network-arch}, ACP needs to handle the fact that the agentic dialog can work even when the client and the server move between IP hosts through the lifetime of the dialog.<a href="#section-6.1.4-1" class="pilcrow">¶</a></p>
+<p id="section-6.1.4-2">Similarly, ACP needs to provide recovery in case any of these hosts should fail during the agentic dialog. This can happen during the exchange of real-time media (e.g., a server fails while receiving the user's voice input), or during the transmission of non-real-time input (the client sends a text message, and the server failed while processing it, but before completion of that processing).<a href="#section-6.1.4-2" class="pilcrow">¶</a></p>
+<p id="section-6.1.4-3">ACP also needs to provide rehydration. If a new client instance starts up in the middle of the dialog, it may need to hydrate any input or output which had been sent or received but not yet made it to any local databases used for storage.<a href="#section-6.1.4-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="error-signaling">
+<section id="section-6.1.5">
+          <h4 id="name-structured-error-and-progre">
+<a href="#section-6.1.5" class="section-number selfRef">6.1.5. </a><a href="#name-structured-error-and-progre" class="section-name selfRef">Structured Error and Progress Signaling</a>
+          </h4>
+<p id="section-6.1.5-1">ACP is required to carry more than the final output of the agent in each turn. It is required to also convey incremental output, progress updates, checkpoint states, cancellation states, and structured errors usable by an orchestrating peer. Error signaling is required to distinguish transport failure from application failure, authorization failure, policy rejection, timeout, validation failure, and interoperability problems. Progress and liveness notifications are required to be representable independently of final completion so that a peer can tell whether an agent is active, blocked on external input, or waiting in a recoverable state. It is required to ensure that terminal error or cancellation signals are not silently lost if an ordinary data stream fails.<a href="#section-6.1.5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="cancellation">
+<section id="section-6.1.6">
+          <h4 id="name-cancellation-and-interrupti">
+<a href="#section-6.1.6" class="section-number selfRef">6.1.6. </a><a href="#name-cancellation-and-interrupti" class="section-name selfRef">Cancellation and Interruption</a>
+          </h4>
+<p id="section-6.1.6-1">Agent execution may be interrupted by user/principal action, policy enforcement, higher-priority work, loss of authorization, or dependent-subtask failure. The protocol is required to define explicit application-layer cancellation and interruption signaling, rather than rely on connection teardown at transport protocol layer. Cancellation is required to identify the affected scope, including a single invocation, delegated subtree, or entire agentic dialog. Receiving agents are required to treat cancellation as idempotent and report whether execution stopped, had already completed, or could not be fully rolled back due to an irreversible action. In multi-hop deployments, interruption semantics are required to propagate predictably so that dependent subtasks do not continue after withdrawal of the parent task.<a href="#section-6.1.6-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="authorization-and-delegation">
+<section id="section-6.2">
+        <h3 id="name-authorization-and-delegatio">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-authorization-and-delegatio" class="section-name selfRef">Authorization and Delegation</a>
+        </h3>
+<p id="section-6.2-1">Authorization and Delegation determines whether a principal is permitted to
+act within an agentic dialog and on whose behalf. This sub-block does not define an
+authorization mechanism. It identifies the functions and the information that
+the Agent Communication Protocol needs to associate with a dialog so that
+existing authorization mechanisms can be applied at the points where they
+matter.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.2-2">ACP relies on objects defined by other standards to convey authorization and identities. In this way, it is extensible and modular to evolving work in this area in the OAuth working group.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
+<div id="delegation">
+<section id="section-6.2.1">
+          <h4 id="name-delegation">
+<a href="#section-6.2.1" class="section-number selfRef">6.2.1. </a><a href="#name-delegation" class="section-name selfRef">Delegation</a>
+          </h4>
+<p id="section-6.2.1-1">Delegation is an act between participants, not a property of a
+transport connection. The architecture distinguishes three roles:<a href="#section-6.2.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.2.1-2.1">
+              <p id="section-6.2.1-2.1.1">the principal, such as a user or an organization, whose authority is
+originally exercised;<a href="#section-6.2.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.2.1-2.2">
+              <p id="section-6.2.1-2.2.1">the delegating agent, which requests another agent to execute a task;<a href="#section-6.2.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.2.1-2.3">
+              <p id="section-6.2.1-2.3.1">the delegated agent, which executes the task.<a href="#section-6.2.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-6.2.1-3">In multi-hop delegation, an agent can be the delegated agent for one hop and
+the delegating agent for the next. A delegating agent can re-delegate authority
+derived from the original principal. A delegation can be revoked or terminated
+independently of the agentic dialog in which it was used.<a href="#section-6.2.1-3" class="pilcrow">¶</a></p>
+<p id="section-6.2.1-4">In delegated use cases, there are two distinct agentic dialogs, each with a distinct dialog context and a distinct ADID. The first is between the principal and the delegating agent, and the second between the delegating agent and the delegated agent. We refer to the second of these as the delegated dialog context. The delegated dialog context has two additional pieces of meta-data - the ADID of the first dialog context, and the identity of the principal in the first context. The delegating agent is responsible for communicating these over ACP. Conceptually, it looks like this:<a href="#section-6.2.1-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-6.2.1-5">
+<pre>
+Principal --------------&gt; Delegating Agent --------------&gt; Delegated Agent
+              ADID:167                         ADID:293
+                                               ADID-Delegation-Chain: 167
+                                               Delegated-From: Principal
+
+</pre><a href="#section-6.2.1-5" class="pilcrow">¶</a>
+</div>
+<p id="section-6.2.1-6">ADID 167 refers to the agentic dialog between the principal and delegating agent. There is a separate agentic dialog, with ADID 293, between the delegating agent and the delegated agent. However, when the second agentic dialog is formed, the delegating agent provides the chain of prior ADIDs. In this case, there is just one - 167 - which refers to the agentic dialog which triggered it. The delegating agent also conveys the identity of the principal on whose behalf they are operating, in this case it is the original principal.<a href="#section-6.2.1-6" class="pilcrow">¶</a></p>
+<p id="section-6.2.1-7">The constraints in <a href="#intent-execution" class="auto internal xref">Section 7.3</a> and <a href="#delegation-chain" class="auto internal xref">Section 7.4</a> apply: the
+authority passed at each hop is limited to the delegated task and is not
+broadened along the chain.<a href="#section-6.2.1-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="identity-management">
+<section id="section-6.3">
+        <h3 id="name-identity-management">
+<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-identity-management" class="section-name selfRef">Identity Management</a>
+        </h3>
+<p id="section-6.3-1">Identity Management establishes who the principal of a dialog is, and the principals in an upward delegation chain. It
+builds on the agent identity requirements in <a href="#agent-identity" class="auto internal xref">Section 7.1</a> and on the
+Agent Identity Management System model in <span>[<a href="#I-D.ietf-wimse-aims" class="cite xref">I-D.ietf-wimse-aims</a>]</span>. The Agent
+Communication Protocol does not define identity credentials or authentication
+protocols. It defines how those identities are associated with the
+agentic dialog and how that association is preserved.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
+<div id="identity-roles">
+<section id="section-6.3.1">
+          <h4 id="name-identity-roles">
+<a href="#section-6.3.1" class="section-number selfRef">6.3.1. </a><a href="#name-identity-roles" class="section-name selfRef">Identity Roles</a>
+          </h4>
+<p id="section-6.3.1-1">The architecture keeps the following identities distinct:<a href="#section-6.3.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.3.1-2.1">
+              <p id="section-6.3.1-2.1.1">the principal identity, which is the identity of the user or organization on
+whose behalf an agent acts;<a href="#section-6.3.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.3.1-2.2">
+              <p id="section-6.3.1-2.2.1">the agent identity, which is the identity of the agent itself and is
+distinct from that of the principal;<a href="#section-6.3.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-6.3.1-3">Keeping these identities distinct is required so that the system can
+distinguish the principal, the delegating agent, and the delegated agent, and so that accountability can be
+assigned to the right entity.<a href="#section-6.3.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="security">
+<section id="section-7">
+      <h2 id="name-security">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-security" class="section-name selfRef">Security</a>
+      </h2>
+<p id="section-7-1">Security for agent communication spans four interdependent concerns: verifiable agent identity, channel protection, binding of authorized intent to agent execution, and delegation chain integrity. The use cases and protocol requirements that motivate this architecture are discussed in <span>[<a href="#I-D.agentic-ai-usecases-requirements" class="cite xref">I-D.agentic-ai-usecases-requirements</a>]</span>. Some of the mechanisms for satisfying these requirements using existing IETF standards are described in <span>[<a href="#I-D.ietf-wimse-aims" class="cite xref">I-D.ietf-wimse-aims</a>]</span>.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<div id="agent-identity">
+<section id="section-7.1">
+        <h3 id="name-agent-identity">
+<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-agent-identity" class="section-name selfRef">Agent Identity</a>
+        </h3>
+<p id="section-7.1-1">Agent identity encompasses two concerns: a stable unique identifier and cryptographic credentials bound to that identifier.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+<p id="section-7.1-2">Every agent is required to be assigned a unique, stable identifier that remains consistent across network reconnections and agentic dialog resumptions. Credentials are required to be bound to the agent's identity. The credential lifecycle, including provisioning, rotation, and revocation, is required to be supported without manual intervention. <span>[<a href="#I-D.ietf-wimse-aims" class="cite xref">I-D.ietf-wimse-aims</a>]</span> defines the term Agent Identity Management System (AIMS) as a conceptual model describing the set of functions required to establish, maintain, and evaluate the identity and permissions of an agent workload.<a href="#section-7.1-2" class="pilcrow">¶</a></p>
+<p id="section-7.1-3">These identity requirements are satisfied by using WIMSE Workload Credentials <span>[<a href="#I-D.ietf-wimse-workload-creds" class="cite xref">I-D.ietf-wimse-workload-creds</a>]</span>: a Workload Identity Token (WIT) at the application layer and a Workload Identity Certificate (WIC) at the transport layer. Both bind a public key to the agent's workload identity.<a href="#section-7.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="channel-protection">
+<section id="section-7.2">
+        <h3 id="name-channel-protection">
+<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-channel-protection" class="section-name selfRef">Channel Protection</a>
+        </h3>
+<p id="section-7.2-1">All agent communication is required to be encrypted and mutually authenticated. This architecture does not define a fallback to cleartext or unauthenticated operation.
+Authentication may operate at the transport layer, the application layer, or both. Transport-layer authentication works well when TLS connections are not terminated by intermediary IP hosts. In architectures involving proxies, application-layer authentication is required to maintain identity continuity across TLS termination points. The channel protection mechanism is required to be negotiated during transport connection establishment, with both endpoints authenticating before any message is exchanged.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="intent-execution">
+<section id="section-7.3">
+        <h3 id="name-intent-execution-separation">
+<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-intent-execution-separation" class="section-name selfRef">Intent-Execution Separation</a>
+        </h3>
+<p id="section-7.3-1">AI agents dynamically generate execution plans and issue sub-requests based on their own reasoning, which may diverge from the scope of the original user authorization. This architecture requires that authorization granted to an agent be limited to the scope of the delegated task, so that an agent cannot use it to authorize actions outside that scope. This depends on delegation mechanics in which an agent acts on behalf of the original user or principal and the authority passed at each hop is narrowed to the delegated task rather than broadened. Standardizing these delegation mechanics for AI agents is an active area of work in the OAuth WG. This document will reference the relevant outcomes as this work matures.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="delegation-chain">
+<section id="section-7.4">
+        <h3 id="name-delegation-chain-integrity">
+<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-delegation-chain-integrity" class="section-name selfRef">Delegation Chain Integrity</a>
+        </h3>
+<p id="section-7.4-1">When one agent delegates a sub-task to another, the receiving agent is authorized only to the extent explicitly permitted by the delegating agent. In multi-hop scenarios, the delegation chain may span several agents before reaching the resource or tool ultimately invoked. At each hop, the receiving party is required to verify that the authority presented was derived from the human or system that originally authorized the task, has not been expanded beyond what was originally granted, and has not been forged or modified in transit. A delegating agent is not permitted to grant authority beyond what the original authorization permits for the delegated task. This draft will be updated with more details as the work progresses in the OAuth WG.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="audit">
+<section id="section-7.5">
+        <h3 id="name-audit-and-non-repudiation">
+<a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-audit-and-non-repudiation" class="section-name selfRef">Audit and Non-Repudiation</a>
+        </h3>
+<p id="section-7.5-1">Agents act on behalf of users/principals or other agents across multiple hops and
+administrative domains. Audit requires that each action be traceable to the
+principal that authorized it and the agent that executed it. For Non-repudiation,
+this traceability is required to be cryptographically verifiable, so that
+no party can later deny its role. The mechanism for recording and
+verifying it is outside the scope of this document.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="transport">
+<section id="section-8">
+      <h2 id="name-transport-aspects">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-transport-aspects" class="section-name selfRef">Transport Aspects</a>
+      </h2>
+<p id="section-8-1">Transport for agent-to-agent communication spans several interdependent concerns: agentic dialog continuity across long-running tasks, heterogeneous delivery semantics, explicit agentic dialog and stream correlation, efficient transfer of large data, signaling for priority and cancellation, structured error propagation, and negotiation of modalities and group communication topologies. The use cases and protocol requirements that motivate these transport properties are discussed in <span>[<a href="#I-D.agentic-ai-usecases-requirements" class="cite xref">I-D.agentic-ai-usecases-requirements</a>]</span>. The transport substrate is not required merely to deliver bytes between endpoints; it is required to preserve the correctness, efficiency, and recoverability of delegated agent execution across administrative domains and under changing network conditions.<a href="#section-8-1" class="pilcrow">¶</a></p>
+<div id="delivery-semantics">
+<section id="section-8.1">
+        <h3 id="name-delivery-semantics">
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-delivery-semantics" class="section-name selfRef">Delivery Semantics</a>
+        </h3>
+<p id="section-8.1-1">ACP requires heterogeneous transport semantics rather than a single uniform model.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
+<p id="section-8.1-2">Agent communication patterns fall into three broad delivery semantic classes, each with distinct transport properties:<a href="#section-8.1-2" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-8.1-3">
+          <dt id="section-8.1-3.1">Reliable ordered delivery:</dt>
+          <dd style="margin-left: 1.5em" id="section-8.1-3.2">
+            <p id="section-8.1-3.2.1">Used for control messages, progress signaling, authorization checkpoints, non-real-time user input, and non-realtime user output. The transport substrate is required to guarantee in-order, lossless delivery for these message classes, and is required to isolate them from other traffic classes to avoid head-of-line blocking.<a href="#section-8.1-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-8.1-3.3">Low-latency, loss-tolerant delivery:</dt>
+          <dd style="margin-left: 1.5em" id="section-8.1-3.4">
+            <p id="section-8.1-3.4.1">Used for real-time audio, video, and high-frequency sensor or telemetry streams. The transport substrate is required to minimize latency for these streams and is not required to guarantee delivery or ordering.<a href="#section-8.1-3.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-8.1-3.5">High-throughput reliable delivery:</dt>
+          <dd style="margin-left: 1.5em" id="section-8.1-3.6">
+            <p id="section-8.1-3.6.1">Used for bulk transfer of large data between principal and agent. The transport substrate is required to support high-throughput reliable transfer with flow-control isolation from other traffic classes [OPEN ISSUE].<a href="#section-8.1-3.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="message-exchange">
+<section id="section-8.2">
+        <h3 id="name-message-exchange-patterns">
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-message-exchange-patterns" class="section-name selfRef">Message Exchange Patterns</a>
+        </h3>
+<p id="section-8.2-1">Agentic dialogs are not limited to simple request-response exchange. An agent may delegate work asynchronously, receive an acknowledgement before completion, stream partial results, emit progress updates, request additional authorization, and later return a final result or cancellation status. The transport is required to take these patterns explicitly into account, including correlation of messages to the relevant agentic dialog. Multiplexing is required so that multiple delegated tasks or tool invocations can proceed concurrently without unrelated head-of-line blocking. The transport is also required to permit out-of-order completion of concurrent subtasks while preserving per-task ordering for incremental output and terminal states.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="priority">
+<section id="section-8.3">
+        <h3 id="name-priority-and-scheduling">
+<a href="#section-8.3" class="section-number selfRef">8.3. </a><a href="#name-priority-and-scheduling" class="section-name selfRef">Priority and Scheduling</a>
+        </h3>
+<p id="section-8.3-1">Delegated agent work varies in urgency and consequence. Some exchanges are on the critical path of a user-visible task, while others are background enrichment, speculative reasoning, or deferred synchronization. The protocol is required to signal task priority and delivery urgency so that transport and scheduling layers can differentiate service. Such signaling is required to be advisory and policy-controlled; a sender is not permitted to raise priority beyond the authority or policy of the delegated task. Priority signaling is also required for coordination messages such as authorization responses, cancellation acknowledgements, and error notifications, because delaying them can break an otherwise correct workflow.<a href="#section-8.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="existingworks">
+<section id="section-9">
+      <h2 id="name-applicability-of-existing-i">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-applicability-of-existing-i" class="section-name selfRef">Applicability of Existing IETF Work</a>
+      </h2>
+<p id="section-9-1">## Reuse As-Is<a href="#section-9-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-9-2.1">
+          <p id="section-9-2.1.1">TLS 1.3 <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span> provides mutual authentication and channel protection. Agents
+are required to negotiate TLS 1.3 or higher.<a href="#section-9-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-9-2.2">
+          <p id="section-9-2.2.1">QUIC <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span> and QUIC-TLS <span>[<a href="#RFC9001" class="cite xref">RFC9001</a>]</span> provide multiplexed streams and 0-RTT
+session resumption.<a href="#section-9-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-9-2.3">
+          <p id="section-9-2.3.1">OAuth 2.0 Token Exchange <span>[<a href="#RFC8693" class="cite xref">RFC8693</a>]</span> provides the base token exchange mechanism.<a href="#section-9-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-9-2.4">
+          <p id="section-9-2.4.1">WIMSE Workload Credentials <span>[<a href="#I-D.ietf-wimse-workload-creds" class="cite xref">I-D.ietf-wimse-workload-creds</a>]</span> are reused for agent
+identity; see <a href="#agent-identity" class="auto internal xref">Section 7.1</a>.<a href="#section-9-2.4.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<div id="profile-or-extend">
+<section id="section-9.1">
+        <h3 id="name-profile-or-extend">
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-profile-or-extend" class="section-name selfRef">Profile or Extend</a>
+        </h3>
+<p id="section-9.1-1">The following existing protocols may require profiling or extension; this list is expected to evolve as new IETF and OAuth WG specifications emerge:<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-9.1-2.1">
+            <p id="section-9.1-2.1.1">The OAuth WG is actively discussing how existing and new mechanisms apply to AI agent authorization. <span>[<a href="#I-D.ietf-oauth-identity-chaining" class="cite xref">I-D.ietf-oauth-identity-chaining</a>]</span> addresses cross-domain authorization, and <span>[<a href="#I-D.ietf-oauth-transaction-tokens" class="cite xref">I-D.ietf-oauth-transaction-tokens</a>]</span> addresses intra-domain token exchange between workloads. This document will track this work and profile the relevant outcomes once the OAuth WG reaches consensus.<a href="#section-9.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.1-2.2">
+            <p id="section-9.1-2.2.1">MoQT (Media over QUIC Transport): acts as a unified transport substrate for distributed agent state synchronization and real-time multimodal communications. Work needs to happen to provide a common mapping of request-response and streaming patterns onto the pub/sub model of MoQT in order to enable interoperability across diverse agent ecosystems.<a href="#section-9.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+</section>
+</div>
+<div id="secconsiderations">
+<section id="section-10">
+      <h2 id="name-security-considerations">
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<p id="section-10-1">AI agents enlarge the attack surface: they act autonomously, delegate across administrative domains, and operate over long-lived dialogs that rely on long-standing delegated authority. This section highlights threats specific to the building blocks in this document; detailed mitigations are expected in the specifications of those building blocks.<a href="#section-10-1" class="pilcrow">¶</a></p>
+<p id="section-10-2">Delegated authority is the primary risk. A rogue or compromised agent may attempt to use delegated authority beyond the task it was granted, or to broaden it as it delegates onward. As required in <a href="#intent-execution" class="auto internal xref">Section 7.3</a> and <a href="#delegation-chain" class="auto internal xref">Section 7.4</a>, authority granted to an agent is scoped to the delegated task and cannot be broadened along the chain, and the delegation chain is verifiable at each hop so an agent on the chain cannot forge or escalate it.<a href="#section-10-2" class="pilcrow">¶</a></p>
+<p id="section-10-3">Valid credentials do not show that an agent runs on an uncompromised platform. Attestation allows a peer to assess the integrity of the agent's execution environment.<a href="#section-10-3" class="pilcrow">¶</a></p>
+<p id="section-10-4">QUIC and TLS 1.3 0-RTT data can be replayed by an attacker (Section 8 of <span>[<a href="#RFC9846" class="cite xref">RFC9846</a>]</span>). Messages that trigger non-idempotent actions are not permitted in 0-RTT data.<a href="#section-10-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="privacy">
+<section id="section-11">
+      <h2 id="name-privacy-considerations">
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
+      </h2>
+<p id="section-11-1">The ADID is used to correlate together distinct agentic dialogs, when one of them triggers the next. This means entities which know the ADID could attempt to access dialog contexts they were not privy to. The Agent Communication Protocol is expected to analyze
+these risks and specify mitigations, such as limiting the scope and
+lifetime of dialog context identifiers.<a href="#section-11-1" class="pilcrow">¶</a></p>
+<p id="section-11-2">Agent identity information is sensitive, particularly in multi-domain
+deployments. Persistent agent identifiers used across dialogs and domains
+enable tracking and correlation of agent activity. Pseudonymous or
+temporary identifiers reduce linkability while preserving the ability to
+audit and enforce accountability where required.<a href="#section-11-2" class="pilcrow">¶</a></p>
+<p id="section-11-3">Because agents exchange rich, potentially sensitive multimodal task context, both message content and metadata require protection. Even with content encrypted, analysis of message sizes, timing, and stream patterns can leak the nature of an agent's tasks; mitigations such as padding may be warranted where that exposure matters.<a href="#section-11-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="iana">
+<section id="section-12">
+      <h2 id="name-iana-considerations">
+<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<p id="section-12-1">This document has no IANA actions.<a href="#section-12-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="sec-combined-references">
+<section id="section-13">
+      <h2 id="name-references">
+<a href="#section-13" class="section-number selfRef">13. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<div id="sec-normative-references">
+<section id="section-13.1">
+        <h3 id="name-normative-references">
+<a href="#section-13.1" class="section-number selfRef">13.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="RFC9000">[RFC9000]</dt>
+        <dd>
+<span class="refAuthor">Iyengar, J., Ed.</span> and <span class="refAuthor">M. Thomson, Ed.</span>, <span class="refTitle">"QUIC: A UDP-Based Multiplexed and Secure Transport"</span>, <span class="seriesInfo">RFC 9000</span>, <span class="seriesInfo">DOI 10.17487/RFC9000</span>, <time datetime="2021-05" class="refDate">May 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9000">https://www.rfc-editor.org/rfc/rfc9000</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9001">[RFC9001]</dt>
+        <dd>
+<span class="refAuthor">Thomson, M., Ed.</span> and <span class="refAuthor">S. Turner, Ed.</span>, <span class="refTitle">"Using TLS to Secure QUIC"</span>, <span class="seriesInfo">RFC 9001</span>, <span class="seriesInfo">DOI 10.17487/RFC9001</span>, <time datetime="2021-05" class="refDate">May 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9001">https://www.rfc-editor.org/rfc/rfc9001</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9846">[RFC9846]</dt>
+      <dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 9846</span>, <span class="seriesInfo">DOI 10.17487/RFC9846</span>, <time datetime="2026-07" class="refDate">July 2026</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9846">https://www.rfc-editor.org/rfc/rfc9846</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-13.2">
+        <h3 id="name-informative-references">
+<a href="#section-13.2" class="section-number selfRef">13.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="A2A">[A2A]</dt>
+        <dd>
+<span class="refAuthor">Google</span>, <span class="refTitle">"Agent2Agent Protocol Specification"</span>, <time datetime="2025" class="refDate">2025</time>, <span>&lt;<a href="https://a2a-protocol.org/v0.2.5/specification/">https://a2a-protocol.org/v0.2.5/specification/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="anthropic-context-def">[anthropic-context-def]</dt>
+        <dd>
+<span class="refAuthor">Anthropic</span>, <span class="refTitle">"Effective Context Engineering for AI Agents"</span>, <time datetime="2025" class="refDate">2025</time>, <span>&lt;<a href="https://www.anthropic.com/research/effective-context-engineering-for-ai-agents">https://www.anthropic.com/research/effective-context-engineering-for-ai-agents</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.agentic-ai-usecases-requirements">[I-D.agentic-ai-usecases-requirements]</dt>
+        <dd>
+<span class="refAuthor">Reddy.K, T.</span>, <span class="refAuthor">Sarker, Z.</span>, and <span class="refAuthor">K. Yao</span>, <span class="refTitle">"Agentic AI Use Cases and Requirements"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-agentic-ai-usecases-requirements-05</span>, <time datetime="2026-10-27" class="refDate">27 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-agentic-ai-usecases-requirements-05">https://datatracker.ietf.org/doc/html/draft-agentic-ai-usecases-requirements-05</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.ietf-oauth-identity-chaining">[I-D.ietf-oauth-identity-chaining]</dt>
+        <dd>
+<span class="refAuthor">Schwenkschuster, A.</span>, <span class="refAuthor">Kasselman, P.</span>, <span class="refAuthor">Burgin, K.</span>, <span class="refAuthor">Jenkins, M. J.</span>, <span class="refAuthor">Campbell, B.</span>, and <span class="refAuthor">A. Parecki</span>, <span class="refTitle">"OAuth Identity and Authorization Chaining Across Domains"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-oauth-identity-chaining-17</span>, <time datetime="2026-07-19" class="refDate">19 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-identity-chaining-17">https://datatracker.ietf.org/doc/html/draft-ietf-oauth-identity-chaining-17</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.ietf-oauth-transaction-tokens">[I-D.ietf-oauth-transaction-tokens]</dt>
+        <dd>
+<span class="refAuthor">Tulshibagwale, A.</span>, <span class="refAuthor">Fletcher, G.</span>, and <span class="refAuthor">P. Kasselman</span>, <span class="refTitle">"Transaction Tokens"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-oauth-transaction-tokens-11</span>, <time datetime="2026-07-30" class="refDate">30 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-transaction-tokens-11">https://datatracker.ietf.org/doc/html/draft-ietf-oauth-transaction-tokens-11</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.ietf-wimse-aims">[I-D.ietf-wimse-aims]</dt>
+        <dd>
+<span class="refAuthor">Kasselman, P.</span>, <span class="refAuthor">Lombardo, J.</span>, <span class="refAuthor">Rosomakho, Y.</span>, <span class="refAuthor">Campbell, B.</span>, <span class="refAuthor">Steele, N.</span>, and <span class="refAuthor">A. Parecki</span>, <span class="refTitle">"AI Identity Management System"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-wimse-aims-00</span>, <time datetime="2026-09-15" class="refDate">15 September 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-wimse-aims-00">https://datatracker.ietf.org/doc/html/draft-ietf-wimse-aims-00</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.ietf-wimse-workload-creds">[I-D.ietf-wimse-workload-creds]</dt>
+        <dd>
+<span class="refAuthor">Campbell, B.</span>, <span class="refAuthor">Salowey, J. A.</span>, <span class="refAuthor">Schwenkschuster, A.</span>, <span class="refAuthor">Sheffer, Y.</span>, and <span class="refAuthor">Y. Rosomakho</span>, <span class="refTitle">"WIMSE Workload Credentials"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-wimse-workload-creds-02</span>, <time datetime="2026-07-02" class="refDate">2 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-wimse-workload-creds-02">https://datatracker.ietf.org/doc/html/draft-ietf-wimse-workload-creds-02</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.rosenberg-aiproto-a2t">[I-D.rosenberg-aiproto-a2t]</dt>
+        <dd>
+<span class="refAuthor">Rosenberg, J.</span> and <span class="refAuthor">P. White</span>, <span class="refTitle">"AI Agent to Tool (A2T) Protocol"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-rosenberg-aiproto-a2t-00</span>, <time datetime="2025-11-06" class="refDate">6 November 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-rosenberg-aiproto-a2t-00">https://datatracker.ietf.org/doc/html/draft-rosenberg-aiproto-a2t-00</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.rosenberg-aiproto-framework">[I-D.rosenberg-aiproto-framework]</dt>
+        <dd>
+<span class="refAuthor">Rosenberg, J.</span> and <span class="refAuthor">C. F. Jennings</span>, <span class="refTitle">"Framework, Use Cases and Requirements for AI Agent Protocols"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-rosenberg-aiproto-framework-00</span>, <time datetime="2025-10-19" class="refDate">19 October 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-rosenberg-aiproto-framework-00">https://datatracker.ietf.org/doc/html/draft-rosenberg-aiproto-framework-00</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="MCP">[MCP]</dt>
+        <dd>
+<span class="refAuthor">Anthropic</span>, <span class="refTitle">"Model Context Protocol"</span>, <time datetime="2024" class="refDate">2024</time>, <span>&lt;<a href="https://modelcontextprotocol.io/specification">https://modelcontextprotocol.io/specification</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC3261">[RFC3261]</dt>
+        <dd>
+<span class="refAuthor">Rosenberg, J.</span>, <span class="refAuthor">Schulzrinne, H.</span>, <span class="refAuthor">Camarillo, G.</span>, <span class="refAuthor">Johnston, A.</span>, <span class="refAuthor">Peterson, J.</span>, <span class="refAuthor">Sparks, R.</span>, <span class="refAuthor">Handley, M.</span>, and <span class="refAuthor">E. Schooler</span>, <span class="refTitle">"SIP: Session Initiation Protocol"</span>, <span class="seriesInfo">RFC 3261</span>, <span class="seriesInfo">DOI 10.17487/RFC3261</span>, <time datetime="2002-07" class="refDate">July 2002</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc3261">https://www.rfc-editor.org/rfc/rfc3261</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC3550">[RFC3550]</dt>
+        <dd>
+<span class="refAuthor">Schulzrinne, H.</span>, <span class="refAuthor">Casner, S.</span>, <span class="refAuthor">Frederick, R.</span>, and <span class="refAuthor">V. Jacobson</span>, <span class="refTitle">"RTP: A Transport Protocol for Real-Time Applications"</span>, <span class="seriesInfo">STD 64</span>, <span class="seriesInfo">RFC 3550</span>, <span class="seriesInfo">DOI 10.17487/RFC3550</span>, <time datetime="2003-07" class="refDate">July 2003</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc3550">https://www.rfc-editor.org/rfc/rfc3550</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8693">[RFC8693]</dt>
+        <dd>
+<span class="refAuthor">Jones, M.</span>, <span class="refAuthor">Nadalin, A.</span>, <span class="refAuthor">Campbell, B., Ed.</span>, <span class="refAuthor">Bradley, J.</span>, and <span class="refAuthor">C. Mortimore</span>, <span class="refTitle">"OAuth 2.0 Token Exchange"</span>, <span class="seriesInfo">RFC 8693</span>, <span class="seriesInfo">DOI 10.17487/RFC8693</span>, <time datetime="2020-01" class="refDate">January 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8693">https://www.rfc-editor.org/rfc/rfc8693</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9420">[RFC9420]</dt>
+      <dd>
+<span class="refAuthor">Barnes, R.</span>, <span class="refAuthor">Beurdouche, B.</span>, <span class="refAuthor">Robert, R.</span>, <span class="refAuthor">Millican, J.</span>, <span class="refAuthor">Omara, E.</span>, and <span class="refAuthor">K. Cohn-Gordon</span>, <span class="refTitle">"The Messaging Layer Security (MLS) Protocol"</span>, <span class="seriesInfo">RFC 9420</span>, <span class="seriesInfo">DOI 10.17487/RFC9420</span>, <time datetime="2023-07" class="refDate">July 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9420">https://www.rfc-editor.org/rfc/rfc9420</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+</section>
+</div>
+<div id="acknowledgments">
+<section id="appendix-A">
+      <h2 id="name-acknowledgments">
+<a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
+      </h2>
+<p id="appendix-A-1">TODO acknowledge.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-B">
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Jonathan Rosenberg</span></div>
+<div dir="auto" class="left"><span class="org">jdrosen.net</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:jdrosen@jdrosen.net" class="email">jdrosen@jdrosen.net</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Zaheduzzaman Sarker</span></div>
+<div dir="auto" class="left"><span class="org">Nokia</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:zaheduzzaman.sarker@nokia.com" class="email">zaheduzzaman.sarker@nokia.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Tirumaleswar Reddy</span></div>
+<div dir="auto" class="left"><span class="org">Nokia</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:k.tirumaleswar_reddy@nokia.com" class="email">k.tirumaleswar_reddy@nokia.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Kehan Yao</span></div>
+<div dir="auto" class="left"><span class="org">China Mobile</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:yaokehan@chinamobile.com" class="email">yaokehan@chinamobile.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Dapeng Liu</span></div>
+<div dir="auto" class="left"><span class="org">Alibaba</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:max.ldp@alibaba-inc.com" class="email">max.ldp@alibaba-inc.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Suresh Krishnan</span></div>
+<div dir="auto" class="left"><span class="org">Cisco</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:suresh.krishnan@gmail.com" class="email">suresh.krishnan@gmail.com</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
