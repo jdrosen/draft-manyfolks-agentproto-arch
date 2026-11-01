@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-29T05:12:17.971848+00:00",
+  "timestamp": "2026-11-01T05:25:13.734864+00:00",
   "repo": "jdrosen/draft-manyfolks-agentproto-arch",
   "labels": [
     {
@@ -318,6 +318,301 @@
           "updatedAt": "2026-10-28T20:30:48Z"
         }
       ]
+    },
+    {
+      "number": 14,
+      "id": "I_kwDOVH3jXs8AAAABa2dG0Q",
+      "title": "Participants in the dialog context meta-data",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/issues/14",
+      "state": "CLOSED",
+      "author": "tireddy2",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The Dialog Context definition lists \u201cparticipants along with their identifiers and roles\u201d as meta-data. Since ACP is two-party, the participants of a dialog are its two endpoints, and each learns the other\u2019s identity by authenticating it at setup. An agent cannot list participants beyond its peer, since it does not know which agent downstream will eventually execute the task.\n\nWhat does \u201cparticipants\u201d refer to, who populates it, and how does a receiver verify it? If it is the two endpoints, it is redundant with authentication and can be dropped from the meta-data.",
+      "createdAt": "2026-10-29T09:36:31Z",
+      "updatedAt": "2026-10-29T16:46:18Z",
+      "closedAt": "2026-10-29T16:46:18Z",
+      "comments": [
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "I think this can be simplified to just the identity of the principal. THis does need to be stored as part of the meta-data. It needs to be remembered so that only that specific user can make further changes to the agentic dialog later on.",
+          "createdAt": "2026-10-29T13:27:12Z",
+          "updatedAt": "2026-10-29T13:27:12Z"
+        },
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "Addressed most of this from a prior comment. Added in explciti mention of delegation chain identities as part of dialog context.",
+          "createdAt": "2026-10-29T16:46:18Z",
+          "updatedAt": "2026-10-29T16:46:18Z"
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "id": "I_kwDOVH3jXs8AAAABa2jtLw",
+      "title": "Carrying a dialog across hops",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/issues/15",
+      "state": "OPEN",
+      "author": "tireddy2",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Section 6.2.1 creates a new dialog for every delegation. A dialog also needs to continue across hops through relays, such as agent gateways and MCP proxies, and within a trust domain where local policy allows it.\n\nSuggest: a new dialog is created at a trust boundary and wherever local policy requires it; otherwise a dialog can continue across hops.",
+      "createdAt": "2026-10-29T09:43:33Z",
+      "updatedAt": "2026-10-29T13:28:46Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "No, I fundamentally disagree with this. This is the same mistake with SIP proxies we made, introducing some kind of intermediary which isn't just a termination point. A relay or MCP proxy - those are all just going to be b2bua entities - terminating the dialog on one side and re-initiating on the other. ",
+          "createdAt": "2026-10-29T13:28:46Z",
+          "updatedAt": "2026-10-29T13:28:46Z"
+        }
+      ]
+    },
+    {
+      "number": 16,
+      "id": "I_kwDOVH3jXs8AAAABa2kWuA",
+      "title": "Who creates the ADID",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/issues/16",
+      "state": "OPEN",
+      "author": "tireddy2",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Section 6.1.1 does not say whether the client or the server generates the ADID. Suggest stating that the participant initiating the dialog generates it, so the receiver can verify the creator against the authenticated identity of the sender.",
+      "createdAt": "2026-10-29T09:44:16Z",
+      "updatedAt": "2026-10-29T13:29:33Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "I disagree with this. The general rule of thumb is - the entity whcih owns the storage of the resource, needs to own generation of the identifier for the resource. In this case, it is the server which owns it, so the server needs to create it. ",
+          "createdAt": "2026-10-29T13:29:32Z",
+          "updatedAt": "2026-10-29T13:29:32Z"
+        }
+      ]
+    },
+    {
+      "number": 17,
+      "id": "I_kwDOVH3jXs8AAAABa2vEKg",
+      "title": "Dialog context log",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/issues/17",
+      "state": "OPEN",
+      "author": "tireddy2",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The dialog context includes an append-only log of all inputs and outputs. Multi-device continuity works today with history kept by the server and fetched by the client, without the log being part of the protocol state. Suggest removing the log from the dialog context. ",
+      "createdAt": "2026-10-29T09:55:19Z",
+      "updatedAt": "2026-10-29T13:30:36Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "But, dialog context *is* the state kept by the server and fetched by the client. So this comment seems inconsistent to me.",
+          "createdAt": "2026-10-29T13:30:36Z",
+          "updatedAt": "2026-10-29T13:30:36Z"
+        }
+      ]
+    },
+    {
+      "number": 18,
+      "id": "I_kwDOVH3jXs8AAAABa2yXgA",
+      "title": "Group delivery vs. two-party",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/issues/18",
+      "state": "CLOSED",
+      "author": "tireddy2",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Section 8.4 describes one-to-many and many-to-many delivery among a dynamic group, which is outside the scope of the WG charter and conflicts with the two-party model in Section 5. You may want to remove it. ",
+      "createdAt": "2026-10-29T09:58:35Z",
+      "updatedAt": "2026-10-29T16:44:25Z",
+      "closedAt": "2026-10-29T16:44:25Z",
+      "comments": [
+        {
+          "author": "zaheduzzaman",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Yes. I also have created a similar issue",
+          "createdAt": "2026-10-29T11:07:49Z",
+          "updatedAt": "2026-10-29T11:07:49Z"
+        },
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "Resolved per other issue - all multiparty is stricken from the doc except delegation.",
+          "createdAt": "2026-10-29T16:44:25Z",
+          "updatedAt": "2026-10-29T16:44:25Z"
+        }
+      ]
+    },
+    {
+      "number": 19,
+      "id": "I_kwDOVH3jXs8AAAABa3dqiA",
+      "title": "Session protocol ??",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/issues/19",
+      "state": "CLOSED",
+      "author": "zaheduzzaman",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/blob/4c3a08c161718f9165dde87cf14c09083337470c/draft-manyfolks-agentproto-arch.md?plain=1#L108-L111\n\nI would not mention session protocol here. During the BoF, it was clear that we are not talking about a session protocol as per say, rather a context management protocol. I also not think it is necessary to mention about SIP here. ",
+      "createdAt": "2026-10-29T10:43:34Z",
+      "updatedAt": "2026-10-29T16:43:56Z",
+      "closedAt": "2026-10-29T16:43:56Z",
+      "comments": [
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "I disagree exactly for the reason you are saying - this has come up many times. This document will be read and used standalone. It is introducing a new type of protocol that we've not had before in IETF, and that is going to require explanation. We should not assume that readers of this doc know the charter and remember the list discussion and so on. ",
+          "createdAt": "2026-10-29T13:31:59Z",
+          "updatedAt": "2026-10-29T13:31:59Z"
+        },
+        {
+          "author": "zaheduzzaman",
+          "authorAssociation": "COLLABORATOR",
+          "body": "But in the charter we are saying - ''The agentic dialog management protocol neither replaces application-layer agent communication protocols nor defines a new transport protocol.\"\n\nand here in the text we are saying we need new session protocol. this to me contradicts. \n\nWe the user/principals having dialog with the agent. I think we should then remove the sentence that we need a new session protocol, rather we need a new dialog management protocol. ",
+          "createdAt": "2026-10-29T13:52:00Z",
+          "updatedAt": "2026-10-29T13:52:00Z"
+        },
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "The entire first half of the doc - the text I contributed - goes to great lengths to try and just even define what a \"dialog management protocol\" is. It is \"session-like\" in that, we have to manage a lifecycle, we need to exchange data, we need to rehydrate and so on. This provides a useful frame of reference for comprehension, and I think that is important for this document. I do not read the charter as saying. \"the word session must not appear in the document\". ",
+          "createdAt": "2026-10-29T13:56:45Z",
+          "updatedAt": "2026-10-29T13:56:45Z"
+        },
+        {
+          "author": "zaheduzzaman",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I am fine with \"session-like\", lets be clear about it in the doc.",
+          "createdAt": "2026-10-29T14:01:31Z",
+          "updatedAt": "2026-10-29T14:16:57Z"
+        },
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "Changed to session-like as an explanatory tool and used the word \"association\" in the definitional places. ",
+          "createdAt": "2026-10-29T16:43:56Z",
+          "updatedAt": "2026-10-29T16:43:56Z"
+        }
+      ]
+    },
+    {
+      "number": 21,
+      "id": "I_kwDOVH3jXs8AAAABa3wdrQ",
+      "title": "Multi-party may be out of scope",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/issues/21",
+      "state": "CLOSED",
+      "author": "zaheduzzaman",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/blob/4c3a08c161718f9165dde87cf14c09083337470c/draft-manyfolks-agentproto-arch.md?plain=1#L635\n\nDuring the charting, we kept the multi-party communication out of scope. Hence, we would be better off if we keep this out of the -00 version. At least MLS does not need to be referred from transport section.",
+      "createdAt": "2026-10-29T11:03:10Z",
+      "updatedAt": "2026-10-29T16:38:04Z",
+      "closedAt": "2026-10-29T16:38:04Z",
+      "comments": [
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "I agree we should bump out everything except for agent chains.",
+          "createdAt": "2026-10-29T13:33:13Z",
+          "updatedAt": "2026-10-29T13:33:13Z"
+        },
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "Removed all references to multiparty use cases. Indeed the word \"participant\" is largely stricken from the doc.",
+          "createdAt": "2026-10-29T16:38:04Z",
+          "updatedAt": "2026-10-29T16:38:04Z"
+        }
+      ]
+    },
+    {
+      "number": 22,
+      "id": "I_kwDOVH3jXs8AAAABa4AiVg",
+      "title": "Where does the name come from?",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/issues/22",
+      "state": "CLOSED",
+      "author": "zaheduzzaman",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/blob/4c3a08c161718f9165dde87cf14c09083337470c/draft-manyfolks-agentproto-arch.md?plain=1#L331\n\nThis is very close to DAWN  and discovery. It need to be described to avoid any confusion that discovery of the name is not within the scope here.",
+      "createdAt": "2026-10-29T11:19:51Z",
+      "updatedAt": "2026-10-29T16:31:48Z",
+      "closedAt": "2026-10-29T16:31:48Z",
+      "comments": [
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "Discovery is not in scope, but what this is saying is - the protocol needs to carry the name of the agent you are connceting too. Its basically going to be in the URI of the eventual protocol, e.g.:\n\nPOST example.com/agents/flight-booking\n\nTHe name of the agent is \"flight-booking\". \n\nIf the protocol carried no naming whatsoever, we'd not be able to support basic multi-tenancy of a single IP or domain name supporting multiple agents, because we'd need to imply the agent being contacted from the IP. I don't think we should do that.",
+          "createdAt": "2026-10-29T13:35:09Z",
+          "updatedAt": "2026-10-29T13:35:09Z"
+        },
+        {
+          "author": "zaheduzzaman",
+          "authorAssociation": "COLLABORATOR",
+          "body": "We have two cases -\n\n1. \"book me a flight to SF\" - here the use does not provide any agent name, the required agent is discovered and used to fulfill the request. Hence the user to agent does not need to have a name of the agent. The discovery of the agent is out of scope.\n2. \"I want to connect to claude\" - here we have a name of the agent, that need to be carried as part of conversation , where claude can be find is out of scope.\nwe need to be clear about it. Now it reads like we always have to know the name of the agent to initiate the session , which I think is not accurate assumption without describing how we are getting the name of the agents.",
+          "createdAt": "2026-10-29T13:48:40Z",
+          "updatedAt": "2026-10-29T13:48:40Z"
+        },
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "Discovery is out of scope, no doubt about it.\n\nI am thinking about cases where an enterprise hosts many agents. We should not assume that each enterprise (aka domain) has just one, and its like a super-agent which just loads skills based on what you ask.\n\nEven if discovery is out of scope (which it is), this does not mean you cannot have an agent name in the protocol. Just like the web - every request to a web page includes its name (the HTTP URI). How you get that URI is out of scope of the HTTP protocol, but it doesnt mean HTTP can work without HTTP URIs. \n\nThe thing I am talking about here is like the SIP URI or HTTP URI - the agent URI which identifies the agent. \n",
+          "createdAt": "2026-10-29T13:53:20Z",
+          "updatedAt": "2026-10-29T13:53:20Z"
+        },
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "Revised the section on names, now titled, \"Agents are IDentified by a URI\". Also explicitly mention discovery is out of scope. ",
+          "createdAt": "2026-10-29T16:31:24Z",
+          "updatedAt": "2026-10-29T16:31:24Z"
+        }
+      ]
+    },
+    {
+      "number": 23,
+      "id": "I_kwDOVH3jXs8AAAABa4PfgQ",
+      "title": "Current document conflicts with charter",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/issues/23",
+      "state": "CLOSED",
+      "author": "zaheduzzaman",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "jdrosen"
+      ],
+      "labels": [],
+      "body": "The charter says -\n\n>> The dialog context consists of the identifiers and lifecycle state needed to correlate and maintain an agentic dialog. It does not include the content exchanged with AI models, such as conversation memory, retrieved documents, or prompts.\n\nNow this conflicts with the whole concept of input, output, and feeding with the LLM context. At least the way it is written now. We need to fix this before publishing.\n\nAlso note that UI rendering related text are out of scope of the charter. We can perhaps rephrase them as exmaple usage.",
+      "createdAt": "2026-10-29T11:35:41Z",
+      "updatedAt": "2026-10-29T16:25:37Z",
+      "closedAt": "2026-10-29T16:25:37Z",
+      "comments": [
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "Firstly - charters are not meant to lock you into to terminology and data architectures that you cannot evolve as you build the protocol. \n\nSecondly - there is a fine distinction here, that we need more work to clarify. Clearly the protocol does care in some way about this content! It is exchanging it for sure. And, if we want to support things like recovery and rehydration, we also need to have this information stored as part of the protocol somewhere. To me, the distinction is that - ACP views these as typed blobs and doesn't care about what's inside, whereas the agent does. But I do think an implementation on the server would need to store it. And - looking forward to potential protocols - MOQT is a natural fit for the data exchange and nicely supports sync and recovery - and that would indeed count as storage. I also worry servers may need additional storage outside of the relay network, and I also don't want to mandate relays for the protocol to work.\n\nSo I think this bit requires a bit more discussion.",
+          "createdAt": "2026-10-29T13:43:35Z",
+          "updatedAt": "2026-10-29T13:43:35Z"
+        },
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "I made a few changes to address this, clarifying that LLM context is invisible to ACP; conversational continuity allows the agent to still decide how to map an agenic dialog to llm context and its outside the scope of ACP. I also added a section to clarify that log content is opaque to ACP, ACP cares only about meta-data.",
+          "createdAt": "2026-10-29T16:25:37Z",
+          "updatedAt": "2026-10-29T16:25:37Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -354,20 +649,111 @@
       "id": "PR_kwDOVH3jXs8AAAABLa4aCA",
       "title": "Should it be Agent (B) instead of Agent (A) in this figure?",
       "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/pull/13",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "maxpassion",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "Should it be Agent (B) instead of Agent (A) in this figure?",
       "createdAt": "2026-10-29T03:01:44Z",
-      "updatedAt": "2026-10-29T03:01:44Z",
+      "updatedAt": "2026-10-29T13:23:41Z",
       "baseRepository": "jdrosen/draft-manyfolks-agentproto-arch",
       "baseRefName": "main",
       "baseRefOid": "4c3a08c161718f9165dde87cf14c09083337470c",
       "headRepository": "maxpassion/draft-manyfolks-agentproto-arch",
       "headRefName": "patch-2",
       "headRefOid": "02619419a3c1f6791f24356829448e75e7873d78",
+      "closedAt": "2026-10-29T13:23:40Z",
+      "mergedAt": "2026-10-29T13:23:40Z",
+      "mergedBy": "jdrosen",
+      "mergeCommit": {
+        "oid": "6908f8538b816838c71570de366c3aa7aa7d250c"
+      },
+      "comments": [
+        {
+          "author": "zaheduzzaman",
+          "authorAssociation": "COLLABORATOR",
+          "body": "yes!",
+          "createdAt": "2026-10-29T10:46:16Z",
+          "updatedAt": "2026-10-29T10:46:16Z"
+        },
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "Yup, thx.",
+          "createdAt": "2026-10-29T13:23:33Z",
+          "updatedAt": "2026-10-29T13:23:33Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 20,
+      "id": "PR_kwDOVH3jXs8AAAABLf3uGQ",
+      "title": "Removes session protocol",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/pull/20",
+      "state": "CLOSED",
+      "author": "zaheduzzaman",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "addresses #19 ",
+      "createdAt": "2026-10-29T10:45:36Z",
+      "updatedAt": "2026-10-30T12:06:51Z",
+      "baseRepository": "jdrosen/draft-manyfolks-agentproto-arch",
+      "baseRefName": "main",
+      "baseRefOid": "4c3a08c161718f9165dde87cf14c09083337470c",
+      "headRepository": "jdrosen/draft-manyfolks-agentproto-arch",
+      "headRefName": "zaheduzzaman-patch-1",
+      "headRefOid": "9ff98d2acd8f32ec3cc249cb4f060298139bae5e",
+      "closedAt": "2026-10-30T12:06:51Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "zaheduzzaman",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Disclaimer: this only fixes the introduction section. however, session is used throughout the document which also needs to taken care of.",
+          "createdAt": "2026-10-29T11:27:31Z",
+          "updatedAt": "2026-10-29T11:27:31Z"
+        },
+        {
+          "author": "jdrosen",
+          "authorAssociation": "OWNER",
+          "body": "I think its helpful for this to be in here. It is one sentence that makes mention of SIP. ",
+          "createdAt": "2026-10-29T13:25:02Z",
+          "updatedAt": "2026-10-29T13:25:02Z"
+        },
+        {
+          "author": "zaheduzzaman",
+          "authorAssociation": "COLLABORATOR",
+          "body": "we fixed this in the latest version, closing",
+          "createdAt": "2026-10-30T12:06:51Z",
+          "updatedAt": "2026-10-30T12:06:51Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 24,
+      "id": "PR_kwDOVH3jXs8AAAABLwiNlQ",
+      "title": "Typo fixes",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/pull/24",
+      "state": "OPEN",
+      "author": "zaheduzzaman",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-10-30T12:06:14Z",
+      "updatedAt": "2026-10-30T12:06:14Z",
+      "baseRepository": "jdrosen/draft-manyfolks-agentproto-arch",
+      "baseRefName": "main",
+      "baseRefOid": "5a0a4251ac14bc62abebe8ece2f3304eb6163d70",
+      "headRepository": "jdrosen/draft-manyfolks-agentproto-arch",
+      "headRefName": "zaheduzzaman-patch-2",
+      "headRefOid": "f5efbebeb0f4a399084d9ae3012252ecf242161f",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
