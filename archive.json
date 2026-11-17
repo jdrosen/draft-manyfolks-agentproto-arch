@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-11-01T05:25:13.734864+00:00",
+  "timestamp": "2026-11-17T07:25:16.239930+00:00",
   "repo": "jdrosen/draft-manyfolks-agentproto-arch",
   "labels": [
     {
@@ -362,7 +362,7 @@
       "labels": [],
       "body": "Section 6.2.1 creates a new dialog for every delegation. A dialog also needs to continue across hops through relays, such as agent gateways and MCP proxies, and within a trust domain where local policy allows it.\n\nSuggest: a new dialog is created at a trust boundary and wherever local policy requires it; otherwise a dialog can continue across hops.",
       "createdAt": "2026-10-29T09:43:33Z",
-      "updatedAt": "2026-10-29T13:28:46Z",
+      "updatedAt": "2026-11-16T21:23:56Z",
       "closedAt": null,
       "comments": [
         {
@@ -371,6 +371,13 @@
           "body": "No, I fundamentally disagree with this. This is the same mistake with SIP proxies we made, introducing some kind of intermediary which isn't just a termination point. A relay or MCP proxy - those are all just going to be b2bua entities - terminating the dialog on one side and re-initiating on the other. ",
           "createdAt": "2026-10-29T13:28:46Z",
           "updatedAt": "2026-10-29T13:28:46Z"
+        },
+        {
+          "author": "MarkAtwood",
+          "authorAssociation": "NONE",
+          "body": "Agree each hop should be its own dialog. But 6.2.1 then sends ADID-Delegation-Chain and Delegated-From downstream, which links the hops back together across domains (the tracking risk \u00a711 describes). Suggest keeping that link local to the delegating agent and not forwarding it across a trust boundary. If audit needs to correlate across domains, that's what law, discovery, and OTel are for, not the base protocol. FWIW the AINetOps hackathon demo did cross-vendor delegation over A2A/MCP without any of it.\n",
+          "createdAt": "2026-11-16T21:23:56Z",
+          "updatedAt": "2026-11-16T21:23:56Z"
         }
       ]
     },
@@ -613,6 +620,22 @@
           "updatedAt": "2026-10-29T16:25:37Z"
         }
       ]
+    },
+    {
+      "number": 25,
+      "id": "I_kwDOVH3jXs8AAAABf1LxBw",
+      "title": "\u00a77.1 stable ID vs \u00a711 pseudonyms",
+      "url": "https://github.com/jdrosen/draft-manyfolks-agentproto-arch/issues/25",
+      "state": "OPEN",
+      "author": "MarkAtwood",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "\u00a77.1 requires every agent to have a unique, stable identifier. \u00a711 says persistent identifiers across domains enable tracking and recommends pseudonymous or temporary ones. Suggest scoping \u00a77.1 to stable within a dialog and within the agent's own domain, with per-dialog identifiers across domains, like the per-dialog ADID in A-SIP.\n",
+      "createdAt": "2026-11-16T21:23:57Z",
+      "updatedAt": "2026-11-16T21:23:57Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
